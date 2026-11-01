@@ -1,0 +1,86 @@
+// @ts-check
+const eslint = require("@eslint/js");
+const { defineConfig } = require("eslint/config");
+const tseslint = require("typescript-eslint");
+const angular = require("angular-eslint");
+const jsdoc = require("eslint-plugin-jsdoc");
+
+/**
+ * Builds a no-restricted-imports rule that forbids importing from the given layers.
+ * @param {string[]} layers Folder names that must not be imported.
+ * @returns {import("eslint").Linter.RulesRecord} The rule record.
+ */
+const forbid = (layers) => ({
+  "no-restricted-imports": [
+    "error",
+    {
+      patterns: layers.map((layer) => ({
+        group: [`**/${layer}`, `**/${layer}/**`],
+        message: `This layer must not import from "${layer}" (atomic design rule).`,
+      })),
+    },
+  ],
+});
+
+module.exports = defineConfig([
+  { ignores: [".angular/**", "storybook-static/**", "node_modules/**", "dist/**"] },
+  {
+    files: ["**/*.ts"],
+    extends: [
+      eslint.configs.recommended,
+      tseslint.configs.recommended,
+      tseslint.configs.stylistic,
+      angular.configs.tsRecommended,
+      jsdoc.configs["flat/recommended-typescript"],
+    ],
+    processor: angular.processInlineTemplates,
+    rules: {
+      "@typescript-eslint/no-explicit-any": "error",
+      "@angular-eslint/directive-selector": [
+        "error",
+        { type: "attribute", prefix: "app", style: "camelCase" },
+      ],
+      "@angular-eslint/component-selector": [
+        "error",
+        { type: "element", prefix: "app", style: "kebab-case" },
+      ],
+      "jsdoc/require-jsdoc": [
+        "error",
+        {
+          require: {
+            ClassDeclaration: true,
+            FunctionDeclaration: true,
+            MethodDefinition: true,
+          },
+          contexts: ["TSInterfaceDeclaration", "TSTypeAliasDeclaration", "TSEnumDeclaration"],
+        },
+      ],
+    },
+  },
+  {
+    files: ["**/*.html"],
+    extends: [angular.configs.templateRecommended, angular.configs.templateAccessibility],
+    rules: {},
+  },
+  // Atomic design: lower layers never import higher layers, and only pages use stores.
+  {
+    files: ["src/app/ui/atoms/**/*.ts"],
+    rules: forbid(["molecules", "organisms", "templates", "state", "pages"]),
+  },
+  {
+    files: ["src/app/ui/molecules/**/*.ts"],
+    rules: forbid(["organisms", "templates", "state", "pages"]),
+  },
+  {
+    files: ["src/app/ui/organisms/**/*.ts"],
+    rules: forbid(["templates", "state", "pages"]),
+  },
+  {
+    files: ["src/app/ui/templates/**/*.ts"],
+    rules: forbid(["state", "pages"]),
+  },
+  {
+    files: ["src/app/domain/**/*.ts"],
+    rules: forbid(["ui", "state", "pages", "core"]),
+  },
+]);

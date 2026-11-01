@@ -1,0 +1,24 @@
+# Environment and secrets
+infra/.env
+.env
+
+# Python
+__pycache__/
+.venv/
+.mypy_cache/
+.ruff_cache/
+*.pyc
+
+# Node / Angular / Storybook
+node_modules/
+dist/
+.angular/
+storybook-static/
+
+# Runtime data
+backups/
+hardware.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
