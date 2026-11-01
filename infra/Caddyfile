@@ -1,0 +1,20 @@
+:80 {
+	encode gzip
+
+	# API with long timeouts and no buffering so Server-Sent Events stream token by token.
+	handle /api/* {
+		reverse_proxy api:8000 {
+			flush_interval -1
+			transport http {
+				read_timeout 10m
+			}
+		}
+	}
+
+	# Angular build; unknown paths fall back to the SPA entry point.
+	handle {
+		root * /srv/web
+		try_files {path} /index.html
+		file_server
+	}
+}
