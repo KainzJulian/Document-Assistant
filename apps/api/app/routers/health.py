@@ -3,14 +3,14 @@
 import asyncio
 
 import httpx
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
-from app.db.session import get_session
+from app.deps import DbSession
 
 router = APIRouter(tags=["health"])
 
@@ -56,7 +56,7 @@ async def _ollama_alive() -> bool:
 
 
 @router.get("/health")
-async def health(session: Session = Depends(get_session)) -> Health:
+async def health(session: DbSession) -> Health:
     """Report the state of every dependency; never fails, so it works as a probe.
 
     Args:
