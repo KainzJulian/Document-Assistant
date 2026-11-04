@@ -8,37 +8,37 @@ A German-language web app for your household that keeps a personal library of do
 
 ### Scope
 
-| Area | In scope | Out of scope |
-| --- | --- | --- |
-| Input | Upload PDF (text-based), TXT, Markdown, DOCX, PPTX, HTML, EPUB; import a URL's main text | Scanned PDFs / images (OCR), JavaScript-only pages, paywalled pages |
-| Library | Automatic saving, per-person library, optional sharing with the household, duplicates detected | Folders, version history of documents |
-| Summaries | Five lengths with fixed word targets, saved per document and length, regenerate on demand | Summaries across several documents at once |
-| Q&A | Chat over one or more selected documents, streamed answers with numbered citations to page/section | Web search, answering from general knowledge without documents |
-| History | Every chat saved automatically; keyword search over titles and messages | Semantic search over chats |
-| Navigation | Sidebar with new chat, library, chat list, search, settings | — |
-| AI | Anthropic, OpenAI, Google (admin's keys) or Ollama; each person picks a model; embeddings model chosen by the admin | Fine-tuning, agents |
-| Ollama check | Server RAM/GPU compared with the selected model's needs; warning with "Trotzdem verwenden" / "Abbrechen" | — |
-| Users | Household accounts (admin + members) | Public sign-up |
+| Area         | In scope                                                                                                            | Out of scope                                                        |
+| ------------ | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Input        | Upload PDF (text-based), TXT, Markdown, DOCX, PPTX, HTML, EPUB; import a URL's main text                            | Scanned PDFs / images (OCR), JavaScript-only pages, paywalled pages |
+| Library      | Automatic saving, per-person library, optional sharing with the household, duplicates detected                      | Folders, version history of documents                               |
+| Summaries    | Five lengths with fixed word targets, saved per document and length, regenerate on demand                           | Summaries across several documents at once                          |
+| Q&A          | Chat over one or more selected documents, streamed answers with numbered citations to page/section                  | Web search, answering from general knowledge without documents      |
+| History      | Every chat saved automatically; keyword search over titles and messages                                             | Semantic search over chats                                          |
+| Navigation   | Sidebar with new chat, library, chat list, search, settings                                                         | —                                                                   |
+| AI           | Anthropic, OpenAI, Google (admin's keys) or Ollama; each person picks a model; embeddings model chosen by the admin | Fine-tuning, agents                                                 |
+| Ollama check | Server RAM/GPU compared with the selected model's needs; warning with "Trotzdem verwenden" / "Abbrechen"            | —                                                                   |
+| Users        | Household accounts (admin + members)                                                                                | Public sign-up                                                      |
 
 ### Decisions from the interview
 
-| Topic | Decision |
-| --- | --- |
-| Platform | Self-hosted web app on your home server; the Ollama check evaluates the server |
-| Users | Household: own library and chats per person; documents can be shared with the household |
-| Access | Home Wi-Fi only, plain HTTP |
-| Stack | Angular + FastAPI + Postgres with pgvector |
-| Q&A | Retrieval with citations (chunks + embeddings + keyword search) |
-| File types | PDF, TXT, Markdown, DOCX, PPTX, HTML, EPUB |
-| Embeddings | Configurable by the admin (local Ollama or cloud); a switch re-indexes in the background |
-| Summary lengths | Extra Short \~50, Short \~150, Medium \~300, Long \~600, Extra Long \~1,200 words; never more than a third of the source |
-| Saved summaries | Stored with the document, one per length, with the model that made it |
-| Chat search | Keyword search, typo-tolerant, German + English |
-| Settings | Admin stores provider keys; each person chooses provider and model |
-| Hardware check | Compared against the selected Ollama model's memory need |
-| Language | German UI |
-| Engineering rules | Docstrings everywhere, atomic design + Storybook, type-safe Python, automated tests in the final wave |
-| Timing | Not fixed; the timeline counts weeks from your start |
+| Topic             | Decision                                                                                                                 |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Platform          | Self-hosted web app on your home server; the Ollama check evaluates the server                                           |
+| Users             | Household: own library and chats per person; documents can be shared with the household                                  |
+| Access            | Home Wi-Fi only, plain HTTP                                                                                              |
+| Stack             | Angular + FastAPI + Postgres with pgvector                                                                               |
+| Q&A               | Retrieval with citations (chunks + embeddings + keyword search)                                                          |
+| File types        | PDF, TXT, Markdown, DOCX, PPTX, HTML, EPUB                                                                               |
+| Embeddings        | Configurable by the admin (local Ollama or cloud); a switch re-indexes in the background                                 |
+| Summary lengths   | Extra Short \~50, Short \~150, Medium \~300, Long \~600, Extra Long \~1,200 words; never more than a third of the source |
+| Saved summaries   | Stored with the document, one per length, with the model that made it                                                    |
+| Chat search       | Keyword search, typo-tolerant, German + English                                                                          |
+| Settings          | Admin stores provider keys; each person chooses provider and model                                                       |
+| Hardware check    | Compared against the selected Ollama model's memory need                                                                 |
+| Language          | German UI                                                                                                                |
+| Engineering rules | Docstrings everywhere, atomic design + Storybook, type-safe Python, automated tests in the final wave                    |
+| Timing            | Not fixed; the timeline counts weeks from your start                                                                     |
 
 ### Timeline
 
@@ -52,15 +52,15 @@ The app becomes useful for real questions after W5 (week 17); summaries follow i
 
 Seven of your criteria needed a concrete meaning before they could be built and tested. Section 11 uses these meanings.
 
-| Criterion | Open point | How the plan reads it |
-| --- | --- | --- |
-| Ollama hardware warning (6) | A browser cannot see a computer's RAM or GPU | The check runs on the server where Ollama runs, and compares free RAM and GPU memory with the selected model's need (section 5) |
-| Accurate output (2) | "Accurately reflects the key points" is not measurable | A fixed test set of 10 documents with hand-written key points. A summary passes if it covers ≥ 80% of them (Medium and longer) and contains no claim the source doesn't support. Checked by a scripted evaluation in W8 |
-| Summary of long documents (2) | Long documents don't fit into a model's context | Documents above the model's budget are summarised in parts, then combined to the target length (section 4) |
-| Interactive Q&A (3) | "Context-aware answers" | Answers use only the selected documents, cite passages as \[1\], \[2\] with document and page/section, and say clearly when the documents don't contain the answer. Follow-up questions see the earlier turns of the chat |
-| URL import (1) | Some pages can't be extracted | Main-text extraction for normal pages; pages that need JavaScript or a login fail with a clear message and offer "Text einfügen" |
-| Search / Q&A section (5) | The name is ambiguous | "Neuer Chat" is the Q&A start page (choose documents, ask); chat search sits at the top of the chat list in the sidebar |
-| Persistent library (1) | Across sessions and devices | Documents live on the server and are available after login on any device at home, until the owner deletes them |
+| Criterion                     | Open point                                             | How the plan reads it                                                                                                                                                                                                     |
+| ----------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ollama hardware warning (6)   | A browser cannot see a computer's RAM or GPU           | The check runs on the server where Ollama runs, and compares free RAM and GPU memory with the selected model's need (section 5)                                                                                           |
+| Accurate output (2)           | "Accurately reflects the key points" is not measurable | A fixed test set of 10 documents with hand-written key points. A summary passes if it covers ≥ 80% of them (Medium and longer) and contains no claim the source doesn't support. Checked by a scripted evaluation in W8   |
+| Summary of long documents (2) | Long documents don't fit into a model's context        | Documents above the model's budget are summarised in parts, then combined to the target length (section 4)                                                                                                                |
+| Interactive Q&A (3)           | "Context-aware answers"                                | Answers use only the selected documents, cite passages as \[1\], \[2\] with document and page/section, and say clearly when the documents don't contain the answer. Follow-up questions see the earlier turns of the chat |
+| URL import (1)                | Some pages can't be extracted                          | Main-text extraction for normal pages; pages that need JavaScript or a login fail with a clear message and offer "Text einfügen"                                                                                          |
+| Search / Q&A section (5)      | The name is ambiguous                                  | "Neuer Chat" is the Q&A start page (choose documents, ask); chat search sits at the top of the chat list in the sidebar                                                                                                   |
+| Persistent library (1)        | Across sessions and devices                            | Documents live on the server and are available after login on any device at home, until the owner deletes them                                                                                                            |
 
 ## 3. Architecture and stack
 
@@ -72,14 +72,14 @@ The api and the worker share Postgres and Ollama; jobs pass through the Postgres
 
 ### Components
 
-| Service | Tech | Responsibility |
-| --- | --- | --- |
-| `proxy` | Caddy 2, port 8080 | Serves the Angular build; `/api/*` → `api`; long timeouts for streaming |
-| `api` | Python 3.12, FastAPI, Uvicorn | Auth, documents, chats, summaries, settings, hardware check; streams answers with Server-Sent Events |
-| `worker` | Same code base, Procrastinate worker | Background jobs: text extraction, chunking, embeddings, re-indexing, long summaries |
-| `db` | Postgres 16 + pgvector | All data, vectors, full-text indexes and the job queue |
-| `ollama` | Ollama (shared or own) | Local chat models and local embeddings |
-| Volume `files` | Disk | Original uploaded files, stored as `<owner>/<document_id>/<filename>` |
+| Service        | Tech                                 | Responsibility                                                                                       |
+| -------------- | ------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| `proxy`        | Caddy 2, port 8080                   | Serves the Angular build; `/api/*` → `api`; long timeouts for streaming                              |
+| `api`          | Python 3.12, FastAPI, Uvicorn        | Auth, documents, chats, summaries, settings, hardware check; streams answers with Server-Sent Events |
+| `worker`       | Same code base, Procrastinate worker | Background jobs: text extraction, chunking, embeddings, re-indexing, long summaries                  |
+| `db`           | Postgres 16 + pgvector               | All data, vectors, full-text indexes and the job queue                                               |
+| `ollama`       | Ollama (shared or own)               | Local chat models and local embeddings                                                               |
+| Volume `files` | Disk                                 | Original uploaded files, stored as `<owner>/<document_id>/<filename>`                                |
 
 The cloud providers (Anthropic, OpenAI, Google) are called directly from `api` and `worker` with the admin's keys. No document text leaves the server unless a cloud provider is chosen for that step.
 
@@ -87,17 +87,17 @@ The cloud providers (Anthropic, OpenAI, Google) are called directly from `api` a
 
 Pin exact versions in W0 and record them in `docs/versions.md`.
 
-| Layer | Choice |
-| --- | --- |
-| Frontend | Angular (newest major supported by Storybook, checked in the W0 spike), standalone + signals, Tailwind CSS 4, `ngx-markdown` for rendering answers |
-| Component workshop | Storybook with autodocs from TSDoc and the a11y addon |
-| Frontend rules | ESLint + `eslint-plugin-jsdoc` (TSDoc required), no `any`, atomic-layer import rules, TS strict |
-| Backend | FastAPI, Pydantic v2 strict, SQLAlchemy 2 typed ORM + Alembic, psycopg 3, Procrastinate (Postgres job queue), `argon2-cffi`, `cryptography` (Fernet for API keys), `psutil` |
-| Extraction | `pymupdf4llm` (PDF → Markdown with page numbers), `python-docx`, `python-pptx`, `trafilatura` (HTML and URLs), `ebooklib` (EPUB), `httpx` |
-| AI SDKs | `anthropic`, `openai`, `google-genai` and `ollama` official Python clients behind one typed provider interface; `tiktoken`-style token estimates per provider |
-| Retrieval | pgvector HNSW index (cosine) + Postgres full-text search, combined with reciprocal rank fusion |
-| Backend rules | `mypy --strict` + `pyright` strict; ruff `D` (Google style) and `ANN` (no `Any`) |
-| Tests (W10) | pytest, Vitest, Storybook interaction tests, Playwright |
+| Layer              | Choice                                                                                                                                                                      |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Frontend           | Angular (newest major supported by Storybook, checked in the W0 spike), standalone + signals, Tailwind CSS 4, `ngx-markdown` for rendering answers                          |
+| Component workshop | Storybook with autodocs from TSDoc and the a11y addon                                                                                                                       |
+| Frontend rules     | ESLint + `eslint-plugin-jsdoc` (TSDoc required), no `any`, atomic-layer import rules, TS strict                                                                             |
+| Backend            | FastAPI, Pydantic v2 strict, SQLAlchemy 2 typed ORM + Alembic, psycopg 3, Procrastinate (Postgres job queue), `argon2-cffi`, `cryptography` (Fernet for API keys), `psutil` |
+| Extraction         | `pymupdf4llm` (PDF → Markdown with page numbers), `python-docx`, `python-pptx`, `trafilatura` (HTML and URLs), `ebooklib` (EPUB), `httpx`                                   |
+| AI SDKs            | `anthropic`, `openai`, `google-genai` and `ollama` official Python clients behind one typed provider interface; `tiktoken`-style token estimates per provider               |
+| Retrieval          | pgvector HNSW index (cosine) + Postgres full-text search, combined with reciprocal rank fusion                                                                              |
+| Backend rules      | `mypy --strict` + `pyright` strict; ruff `D` (Google style) and `ANN` (no `Any`)                                                                                            |
+| Tests (W10)        | pytest, Vitest, Storybook interaction tests, Playwright                                                                                                                     |
 
 ### Repository layout
 
@@ -178,12 +178,12 @@ The check runs on the server every time someone selects an Ollama model in setti
 
 ### Verdicts
 
-| Verdict | Rule | Message (German UI) |
-| --- | --- | --- |
-| Passt | free VRAM ≥ need | Green chip "Passt", no dialog |
-| Teilweise GPU | 0 < free VRAM < need, and free VRAM + free RAM ≥ need | "Läuft teilweise auf der GPU – Antworten langsamer" |
-| Nur CPU | no GPU, free RAM ≥ need | "Keine GPU – Antworten sehr langsam (geschätzt \~N Wörter/s)" |
-| Passt nicht | free VRAM + free RAM < need | "Zu wenig Speicher – das Modell startet wahrscheinlich nicht" |
+| Verdict       | Rule                                                  | Message (German UI)                                           |
+| ------------- | ----------------------------------------------------- | ------------------------------------------------------------- |
+| Passt         | free VRAM ≥ need                                      | Green chip "Passt", no dialog                                 |
+| Teilweise GPU | 0 < free VRAM < need, and free VRAM + free RAM ≥ need | "Läuft teilweise auf der GPU – Antworten langsamer"           |
+| Nur CPU       | no GPU, free RAM ≥ need                               | "Keine GPU – Antworten sehr langsam (geschätzt \~N Wörter/s)" |
+| Passt nicht   | free VRAM + free RAM < need                           | "Zu wenig Speicher – das Modell startet wahrscheinlich nicht" |
 
 The speed estimate uses memory bandwidth ÷ model size, with a configurable bandwidth constant (default 20 GB/s for a dual-channel DDR4 mini PC). A "Geschwindigkeit testen" button runs a 20-second generation and shows the measured value instead.
 
@@ -203,22 +203,22 @@ With 16 GB RAM and no GPU: an 8B model at 4-bit (\~5 GB) gets "Nur CPU" at rough
 
 The app has 14 tables in Postgres, plus Procrastinate's own job tables. Every row that belongs to a person carries `owner_id`, and every query filters by it in one shared repository layer, so one person can't reach another's data by accident.
 
-| Table | Columns | Notes |
-| --- | --- | --- |
-| `users` | `id uuid pk`, `username citext unique`, `display_name`, `password_hash`, `role` (`admin` / `member`), `disabled bool`, `created_at` | Created by the admin; no sign-up |
-| `sessions` | `id` (hash of a random token), `user_id`, `created_at`, `expires_at`, `last_seen_at` | HttpOnly cookie, `SameSite=Strict`, 30 days sliding |
-| `documents` | `id uuid pk`, `owner_id`, `title`, `source_type` (`file` / `url` / `text`), `filename`, `mime`, `size_bytes`, `url`, `url_normalized`, `content_hash`, `language`, `page_count`, `word_count`, `status`, `error`, `shared bool`, `created_at`, `updated_at` | Unique (`owner_id`, `content_hash`) and (`owner_id`, `url_normalized`) |
-| `document_texts` | `document_id pk`, `markdown text`, `extractor`, `extracted_at` | Kept separate so the library list stays light |
-| `chunks` | `id uuid pk`, `document_id`, `ordinal`, `section_path`, `page_from`, `page_to`, `text`, `word_count`, `tsv tsvector generated` (`simple` + `unaccent`) | GIN index on `tsv` |
-| `embedding_models` | `id`, `provider`, `model`, `dims`, `status` (`building` / `active` / `retired`), `progress`, `created_at` | Exactly one `active` |
-| `chunk_embeddings` | `chunk_id`, `model_id`, `embedding vector` | Composite pk; one HNSW cosine index per model, created by the re-index job with the model's dimensions |
-| `summaries` | `id`, `document_id`, `length` (`xs` / `s` / `m` / `l` / `xl`), `text`, `word_count`, `target_words`, `provider`, `model`, `created_by`, `created_at` | Unique (`document_id`, `length`) |
-| `chats` | `id uuid pk`, `owner_id`, `title`, `provider`, `model`, `created_at`, `updated_at` | Title generated after the first answer, editable |
-| `chat_documents` | `chat_id`, `document_id` | Selected sources; can change during a chat |
-| `messages` | `id uuid pk`, `chat_id`, `role` (`user` / `assistant`), `content`, `citations jsonb`, `provider`, `model`, `tokens_in`, `tokens_out`, `created_at`, `tsv tsvector generated` | GIN on `tsv`; trigram index on `content` for typo tolerance |
-| `providers` | `id`, `kind` (`anthropic` / `openai` / `google` / `ollama`), `label`, `base_url`, `api_key_enc`, `enabled`, `models jsonb` (cached model list) | Admin only; keys encrypted with a Fernet key from `.env` |
-| `user_settings` | `user_id pk`, `provider_id`, `model`, `summary_language` (`source` / `de`) |  |
-| `ollama_acknowledgements` | `user_id`, `model`, `verdict`, `acknowledged_at` | Lets the dialog re-appear only when the verdict gets worse |
+| Table                     | Columns                                                                                                                                                                                                                                                     | Notes                                                                                                  |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `users`                   | `id uuid pk`, `username citext unique`, `display_name`, `password_hash`, `role` (`admin` / `member`), `disabled bool`, `created_at`                                                                                                                         | Created by the admin; no sign-up                                                                       |
+| `sessions`                | `id` (hash of a random token), `user_id`, `created_at`, `expires_at`, `last_seen_at`                                                                                                                                                                        | HttpOnly cookie, `SameSite=Strict`, 30 days sliding                                                    |
+| `documents`               | `id uuid pk`, `owner_id`, `title`, `source_type` (`file` / `url` / `text`), `filename`, `mime`, `size_bytes`, `url`, `url_normalized`, `content_hash`, `language`, `page_count`, `word_count`, `status`, `error`, `shared bool`, `created_at`, `updated_at` | Unique (`owner_id`, `content_hash`) and (`owner_id`, `url_normalized`)                                 |
+| `document_texts`          | `document_id pk`, `markdown text`, `extractor`, `extracted_at`                                                                                                                                                                                              | Kept separate so the library list stays light                                                          |
+| `chunks`                  | `id uuid pk`, `document_id`, `ordinal`, `section_path`, `page_from`, `page_to`, `text`, `word_count`, `tsv tsvector generated` (`simple` + `unaccent`)                                                                                                      | GIN index on `tsv`                                                                                     |
+| `embedding_models`        | `id`, `provider`, `model`, `dims`, `status` (`building` / `active` / `retired`), `progress`, `created_at`                                                                                                                                                   | Exactly one `active`                                                                                   |
+| `chunk_embeddings`        | `chunk_id`, `model_id`, `embedding vector`                                                                                                                                                                                                                  | Composite pk; one HNSW cosine index per model, created by the re-index job with the model's dimensions |
+| `summaries`               | `id`, `document_id`, `length` (`xs` / `s` / `m` / `l` / `xl`), `text`, `word_count`, `target_words`, `provider`, `model`, `created_by`, `created_at`                                                                                                        | Unique (`document_id`, `length`)                                                                       |
+| `chats`                   | `id uuid pk`, `owner_id`, `title`, `provider`, `model`, `created_at`, `updated_at`                                                                                                                                                                          | Title generated after the first answer, editable                                                       |
+| `chat_documents`          | `chat_id`, `document_id`                                                                                                                                                                                                                                    | Selected sources; can change during a chat                                                             |
+| `messages`                | `id uuid pk`, `chat_id`, `role` (`user` / `assistant`), `content`, `citations jsonb`, `provider`, `model`, `tokens_in`, `tokens_out`, `created_at`, `tsv tsvector generated`                                                                                | GIN on `tsv`; trigram index on `content` for typo tolerance                                            |
+| `providers`               | `id`, `kind` (`anthropic` / `openai` / `google` / `ollama`), `label`, `base_url`, `api_key_enc`, `enabled`, `models jsonb` (cached model list)                                                                                                              | Admin only; keys encrypted with a Fernet key from `.env`                                               |
+| `user_settings`           | `user_id pk`, `provider_id`, `model`, `summary_language` (`source` / `de`)                                                                                                                                                                                  |                                                                                                        |
+| `ollama_acknowledgements` | `user_id`, `model`, `verdict`, `acknowledged_at`                                                                                                                                                                                                            | Lets the dialog re-appear only when the verdict gets worse                                             |
 
 ### Visibility rules
 
@@ -231,18 +231,18 @@ The app has 14 tables in Postgres, plus Procrastinate's own job tables. Every ro
 
 All endpoints live under `/api` and need a session cookie, except login and health. State-changing requests also need the header `X-Requested-With: app` as CSRF protection alongside `SameSite=Strict`. Errors use `{"error": {"code", "message", "details"}}` with German messages.
 
-| Area | Endpoints |
-| --- | --- |
-| Auth | `POST /auth/login` {username, password} · `POST /auth/logout` · `GET /auth/me` |
-| Users (admin) | `GET /users` · `POST /users` · `PATCH /users/{id}` (name, role, disabled, password reset) |
-| Documents | `POST /documents/upload` (multipart, several files) · `POST /documents/url` {url} · `POST /documents/text` {title, text} · `GET /documents?q=&status=&shared=` · `GET /documents/{id}` · `GET /documents/{id}/text` · `GET /documents/{id}/file` · `PATCH /documents/{id}` (title, shared) · `DELETE /documents/{id}` · `POST /documents/{id}/retry` · `GET /documents/events` (SSE status updates) |
-| Summaries | `GET /documents/{id}/summaries` · `POST /documents/{id}/summaries` {length, language} → SSE stream (`progress`, `token`, `done`) |
-| Chats | `GET /chats?q=` (keyword search with highlighted snippets) · `POST /chats` {document\_ids} · `GET /chats/{id}` · `PATCH /chats/{id}` (title, document\_ids) · `DELETE /chats/{id}` |
-| Messages | `POST /chats/{id}/messages` {content} → SSE stream (`token`, `citations`, `done`, `error`) · `POST /chats/{id}/messages/{mid}/regenerate` · `GET /chunks/{id}` (passage for the citation panel) |
-| Settings | `GET /settings` · `PUT /settings` {provider\_id, model, summary\_language} · `GET /providers/{id}/models` |
-| Hardware | `GET /hardware/ollama-fit?model=` → {ram, gpu, need\_gb, verdict, est\_words\_per\_s} · `POST /hardware/ollama-benchmark` {model} · `POST /settings/ollama-ack` {model, verdict} |
-| Admin | `GET/POST/PATCH/DELETE /admin/providers` (keys write-only) · `POST /admin/providers/{id}/test` · `GET /admin/embedding-models` · `POST /admin/embedding-models` {provider, model} (starts re-index) |
-| Health | `GET /health` {db, worker, ollama, providers} |
+| Area          | Endpoints                                                                                                                                                                                                                                                                                                                                                                                           |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Auth          | `POST /auth/login` {username, password} · `POST /auth/logout` · `GET /auth/me`                                                                                                                                                                                                                                                                                                                      |
+| Users (admin) | `GET /users` · `POST /users` · `PATCH /users/{id}` (name, role, disabled, password reset)                                                                                                                                                                                                                                                                                                           |
+| Documents     | `POST /documents/upload` (multipart, several files) · `POST /documents/url` {url} · `POST /documents/text` {title, text} · `GET /documents?q=&status=&shared=` · `GET /documents/{id}` · `GET /documents/{id}/text` · `GET /documents/{id}/file` · `PATCH /documents/{id}` (title, shared) · `DELETE /documents/{id}` · `POST /documents/{id}/retry` · `GET /documents/events` (SSE status updates) |
+| Summaries     | `GET /documents/{id}/summaries` · `POST /documents/{id}/summaries` {length, language} → SSE stream (`progress`, `token`, `done`)                                                                                                                                                                                                                                                                    |
+| Chats         | `GET /chats?q=` (keyword search with highlighted snippets) · `POST /chats` {document_ids} · `GET /chats/{id}` · `PATCH /chats/{id}` (title, document_ids) · `DELETE /chats/{id}`                                                                                                                                                                                                                    |
+| Messages      | `POST /chats/{id}/messages` {content} → SSE stream (`token`, `citations`, `done`, `error`) · `POST /chats/{id}/messages/{mid}/regenerate` · `GET /chunks/{id}` (passage for the citation panel)                                                                                                                                                                                                     |
+| Settings      | `GET /settings` · `PUT /settings` {provider_id, model, summary_language} · `GET /providers/{id}/models`                                                                                                                                                                                                                                                                                             |
+| Hardware      | `GET /hardware/ollama-fit?model=` → {ram, gpu, need_gb, verdict, est_words_per_s} · `POST /hardware/ollama-benchmark` {model} · `POST /settings/ollama-ack` {model, verdict}                                                                                                                                                                                                                        |
+| Admin         | `GET/POST/PATCH/DELETE /admin/providers` (keys write-only) · `POST /admin/providers/{id}/test` · `GET /admin/embedding-models` · `POST /admin/embedding-models` {provider, model} (starts re-index)                                                                                                                                                                                                 |
+| Health        | `GET /health` {db, worker, ollama, providers}                                                                                                                                                                                                                                                                                                                                                       |
 
 The OpenAPI schema generates the TypeScript client types (`openapi-typescript`), so frontend and backend share one contract. Streaming endpoints document their event types as Pydantic models too.
 
@@ -463,60 +463,60 @@ Goal: every Check becomes an automated test, bugs found are fixed, v1.0 ships. A
 
 The app is done when all 20 criteria pass. AC-1.1 to AC-6.3 are your criteria in your order, made measurable; AC-7.1 and AC-7.2 cover the household decisions. Automated tests in the last column are written in W10.
 
-| AC | Done when | Built in | Verified by |
-| --- | --- | --- | --- |
-| AC-1.1 File upload | PDF, TXT, MD, DOCX, PPTX, HTML and EPUB up to 50 MB upload (several at once) and reach "Bereit"; unsupported or scanned files fail with a clear German message | W1 | pytest extractors, Playwright `upload.spec` |
-| AC-1.2 URL import | A URL becomes a document with clean main text, title and source; ≥ 13 of 15 sample URLs extract cleanly; failures offer "Text einfügen" | W2 | pytest on recorded pages, Playwright `url.spec` |
-| AC-1.3 Automatic saving | Every upload and URL import appears in the library without a save step; duplicates are detected | W1, W2 | Playwright `library.spec` |
-| AC-1.4 Persistent library | Documents remain after logout, browser restart and server restart, on any household device, until deleted | W1 | Playwright `persistence.spec`, manual server restart |
-| AC-2.1 Summary generation | Any ready document (own or shared) can be summarised; the result streams in and is saved | W7 | Playwright `summary.spec` |
-| AC-2.2 Length selection | Five labelled lengths with word targets are chosen before generating; output lands within ± 20% of the target or the third-of-source cap | W7 | pytest length logic, Playwright |
-| AC-2.3 Accurate output | On the 10-document test set: ≥ 80% key-point coverage (Medium and longer) and ≥ 90% of summaries with no unsupported claim | W8 | `eval/run_summaries.py` report |
-| AC-3.1 Chatbot interface | Familiar chat layout: input at the bottom, streaming answers, Markdown, copy, stop and regenerate | W5 | Playwright `chat.spec` |
-| AC-3.2 Document selection | One or more documents are chosen from a searchable list before or during a chat; answers only use those | W5 | pytest retrieval filter, Playwright |
-| AC-3.3 Interactive Q&A | Answers cite passages, handle follow-ups, and say "nicht gefunden" when the documents lack the answer; ≥ 85% correct on the test set | W4, W5, W8 | `eval/run_rag.py`, Playwright |
-| AC-4.1 Chat auto-save | Every message is saved as it happens, including interrupted answers | W5 | pytest, Playwright reload test |
-| AC-4.2 Chat search | Keyword search over titles and messages finds chats (typo-tolerant) in < 300 ms with 500 chats and opens them at the match | W6 | pytest search, Playwright `search.spec` |
-| AC-5.1 Sidebar | Always visible from 1024 px, a drawer below; works on phone, tablet and desktop | W0.6 | Storybook viewports, Playwright |
-| AC-5.2 Section switching | One click switches between Neuer Chat, Bibliothek, Einstellungen and any chat without losing typed input | W6.1 | Playwright `navigation.spec` |
-| AC-5.3 Chat management | Chats are listed by date, can be resumed, renamed and deleted | W6.1 | Playwright |
-| AC-6.1 Settings area | A clear "Einstellungen" section for model, summary language and account (plus admin sections) | W3.3 | Playwright `settings.spec` |
-| AC-6.2 Model choice | Each person picks Ollama or a cloud model (Anthropic, Google, OpenAI) from the admin's configured providers | W3 | Playwright |
-| AC-6.3 Ollama warning | Selecting an Ollama model evaluates server RAM/GPU against the model's need; for every verdict except "Passt" a warning shows the numbers, and "Trotzdem verwenden" / "Abbrechen" work as specified | W3.4, W3.5 | pytest 8 hardware combinations, Storybook play test, Playwright with fake readings |
-| AC-7.1 Household accounts | Each person has their own library and chats; shared documents are visible read-only to others; nobody can open another person's private data | W0.5, W1.5 | pytest visibility rules, Playwright two-user spec |
-| AC-7.2 Admin keys | Only the admin manages providers; keys are encrypted and never returned by the API or written to logs | W3.2 | pytest, log scan in W10 |
+| AC                        | Done when                                                                                                                                                                                           | Built in   | Verified by                                                                        |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------- |
+| AC-1.1 File upload        | PDF, TXT, MD, DOCX, PPTX, HTML and EPUB up to 50 MB upload (several at once) and reach "Bereit"; unsupported or scanned files fail with a clear German message                                      | W1         | pytest extractors, Playwright `upload.spec`                                        |
+| AC-1.2 URL import         | A URL becomes a document with clean main text, title and source; ≥ 13 of 15 sample URLs extract cleanly; failures offer "Text einfügen"                                                             | W2         | pytest on recorded pages, Playwright `url.spec`                                    |
+| AC-1.3 Automatic saving   | Every upload and URL import appears in the library without a save step; duplicates are detected                                                                                                     | W1, W2     | Playwright `library.spec`                                                          |
+| AC-1.4 Persistent library | Documents remain after logout, browser restart and server restart, on any household device, until deleted                                                                                           | W1         | Playwright `persistence.spec`, manual server restart                               |
+| AC-2.1 Summary generation | Any ready document (own or shared) can be summarised; the result streams in and is saved                                                                                                            | W7         | Playwright `summary.spec`                                                          |
+| AC-2.2 Length selection   | Five labelled lengths with word targets are chosen before generating; output lands within ± 20% of the target or the third-of-source cap                                                            | W7         | pytest length logic, Playwright                                                    |
+| AC-2.3 Accurate output    | On the 10-document test set: ≥ 80% key-point coverage (Medium and longer) and ≥ 90% of summaries with no unsupported claim                                                                          | W8         | `eval/run_summaries.py` report                                                     |
+| AC-3.1 Chatbot interface  | Familiar chat layout: input at the bottom, streaming answers, Markdown, copy, stop and regenerate                                                                                                   | W5         | Playwright `chat.spec`                                                             |
+| AC-3.2 Document selection | One or more documents are chosen from a searchable list before or during a chat; answers only use those                                                                                             | W5         | pytest retrieval filter, Playwright                                                |
+| AC-3.3 Interactive Q&A    | Answers cite passages, handle follow-ups, and say "nicht gefunden" when the documents lack the answer; ≥ 85% correct on the test set                                                                | W4, W5, W8 | `eval/run_rag.py`, Playwright                                                      |
+| AC-4.1 Chat auto-save     | Every message is saved as it happens, including interrupted answers                                                                                                                                 | W5         | pytest, Playwright reload test                                                     |
+| AC-4.2 Chat search        | Keyword search over titles and messages finds chats (typo-tolerant) in < 300 ms with 500 chats and opens them at the match                                                                          | W6         | pytest search, Playwright `search.spec`                                            |
+| AC-5.1 Sidebar            | Always visible from 1024 px, a drawer below; works on phone, tablet and desktop                                                                                                                     | W0.6       | Storybook viewports, Playwright                                                    |
+| AC-5.2 Section switching  | One click switches between Neuer Chat, Bibliothek, Einstellungen and any chat without losing typed input                                                                                            | W6.1       | Playwright `navigation.spec`                                                       |
+| AC-5.3 Chat management    | Chats are listed by date, can be resumed, renamed and deleted                                                                                                                                       | W6.1       | Playwright                                                                         |
+| AC-6.1 Settings area      | A clear "Einstellungen" section for model, summary language and account (plus admin sections)                                                                                                       | W3.3       | Playwright `settings.spec`                                                         |
+| AC-6.2 Model choice       | Each person picks Ollama or a cloud model (Anthropic, Google, OpenAI) from the admin's configured providers                                                                                         | W3         | Playwright                                                                         |
+| AC-6.3 Ollama warning     | Selecting an Ollama model evaluates server RAM/GPU against the model's need; for every verdict except "Passt" a warning shows the numbers, and "Trotzdem verwenden" / "Abbrechen" work as specified | W3.4, W3.5 | pytest 8 hardware combinations, Storybook play test, Playwright with fake readings |
+| AC-7.1 Household accounts | Each person has their own library and chats; shared documents are visible read-only to others; nobody can open another person's private data                                                        | W0.5, W1.5 | pytest visibility rules, Playwright two-user spec                                  |
+| AC-7.2 Admin keys         | Only the admin manages providers; keys are encrypted and never returned by the API or written to logs                                                                                               | W3.2       | pytest, log scan in W10                                                            |
 
 ## 12. Defaults and risks
 
 ### Defaults chosen
 
-| Default | Where it matters | Alternative |
-| --- | --- | --- |
-| Runs on the recipe app's mini PC at port 8080 | W0.1 | Separate host or hostname |
-| Shares the recipe app's Ollama if running | W0.1 | Own Ollama container |
-| 50 MB upload limit; scanned PDFs rejected | W1 | Larger limit; OCR as an extra wave (≈ 15 h) |
-| `pymupdf4llm` for PDFs (AGPL licence, fine for private self-hosting, recorded in an ADR) | W1.2 | `pypdf` (MIT), weaker layout |
-| Chunks of 400 words, max 600, 60-word overlap | W4.1 | Tuned in W8 |
-| Default local embedding model bge-m3 (1024 dims) | W4.2 | Any Ollama or cloud embedding model |
-| Top 8 passages, max 6,000 tokens; last 4 turns as chat memory | W4.4, W5 | Tuned in W8 |
-| Summaries keep the source language unless "Deutsch" is chosen | W7 | Always German |
-| Shared documents are read-only for others; summaries shared with them | W1.5 | Private summaries |
-| Chats stay private, even when they use shared documents | W5 | Shared chats |
-| Session cookie 30 days, no `Secure` flag (plain HTTP on the LAN) | W0.5 | Tailscale + HTTPS later |
-| Token usage stored per message, no price display | W5 | Cost estimate per provider |
-| Bandwidth constant 20 GB/s for the CPU speed estimate | W3.4 | Measured via the benchmark button |
-| Judge model for evaluations: your strongest cloud model | W8 | Manual review only |
+| Default                                                                                  | Where it matters | Alternative                                 |
+| ---------------------------------------------------------------------------------------- | ---------------- | ------------------------------------------- |
+| Runs on the recipe app's mini PC at port 8080                                            | W0.1             | Separate host or hostname                   |
+| Shares the recipe app's Ollama if running                                                | W0.1             | Own Ollama container                        |
+| 50 MB upload limit; scanned PDFs rejected                                                | W1               | Larger limit; OCR as an extra wave (≈ 15 h) |
+| `pymupdf4llm` for PDFs (AGPL licence, fine for private self-hosting, recorded in an ADR) | W1.2             | `pypdf` (MIT), weaker layout                |
+| Chunks of 400 words, max 600, 60-word overlap                                            | W4.1             | Tuned in W8                                 |
+| Default local embedding model bge-m3 (1024 dims)                                         | W4.2             | Any Ollama or cloud embedding model         |
+| Top 8 passages, max 6,000 tokens; last 4 turns as chat memory                            | W4.4, W5         | Tuned in W8                                 |
+| Summaries keep the source language unless "Deutsch" is chosen                            | W7               | Always German                               |
+| Shared documents are read-only for others; summaries shared with them                    | W1.5             | Private summaries                           |
+| Chats stay private, even when they use shared documents                                  | W5               | Shared chats                                |
+| Session cookie 30 days, no `Secure` flag (plain HTTP on the LAN)                         | W0.5             | Tailscale + HTTPS later                     |
+| Token usage stored per message, no price display                                         | W5               | Cost estimate per provider                  |
+| Bandwidth constant 20 GB/s for the CPU speed estimate                                    | W3.4             | Measured via the benchmark button           |
+| Judge model for evaluations: your strongest cloud model                                  | W8               | Manual review only                          |
 
 ### Risks
 
-| Risk | Effect | Mitigation |
-| --- | --- | --- |
-| CPU-only Ollama on the mini PC | Local chat answers at a few words per second; local summaries of long documents take many minutes | The hardware warning says so up front; cloud models for heavy work; local embeddings are still fine |
-| Embedding a large library on CPU | First indexing of hundreds of documents takes hours | Background jobs with progress; documents become usable one by one |
-| Cloud providers see document text | Privacy concern for personal files | Shown in settings and the user guide; local models available for everything |
-| Extraction quality varies (complex PDFs, slides, odd websites) | Wrong or missing text, weaker answers | Text viewer shows exactly what was extracted; "Erneut verarbeiten"; "Text einfügen" for URLs |
-| Model answers despite missing information | Confident but wrong answers | Strict prompt, mandatory citations, "not found" test questions in W8 |
-| Plain HTTP on the LAN | Passwords and API traffic to the server readable on your Wi-Fi | Keys never leave the server; guest Wi-Fi separated; Tailscale is the easy upgrade |
-| Provider APIs and model names change | Broken model lists or calls | Model lists fetched live; adapters isolated per provider; the health page shows provider status |
-| Tests only in W10 | Bugs surface late | Evaluation scripts in W4 and W8 catch the quality problems early; 40% of W10 for fixes; 3-week buffer |
-| Three projects at 5–10 h per week | Long overall timeline | This plan is independent of the other two and can start whenever you choose |
+| Risk                                                           | Effect                                                                                            | Mitigation                                                                                            |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| CPU-only Ollama on the mini PC                                 | Local chat answers at a few words per second; local summaries of long documents take many minutes | The hardware warning says so up front; cloud models for heavy work; local embeddings are still fine   |
+| Embedding a large library on CPU                               | First indexing of hundreds of documents takes hours                                               | Background jobs with progress; documents become usable one by one                                     |
+| Cloud providers see document text                              | Privacy concern for personal files                                                                | Shown in settings and the user guide; local models available for everything                           |
+| Extraction quality varies (complex PDFs, slides, odd websites) | Wrong or missing text, weaker answers                                                             | Text viewer shows exactly what was extracted; "Erneut verarbeiten"; "Text einfügen" for URLs          |
+| Model answers despite missing information                      | Confident but wrong answers                                                                       | Strict prompt, mandatory citations, "not found" test questions in W8                                  |
+| Plain HTTP on the LAN                                          | Passwords and API traffic to the server readable on your Wi-Fi                                    | Keys never leave the server; guest Wi-Fi separated; Tailscale is the easy upgrade                     |
+| Provider APIs and model names change                           | Broken model lists or calls                                                                       | Model lists fetched live; adapters isolated per provider; the health page shows provider status       |
+| Tests only in W10                                              | Bugs surface late                                                                                 | Evaluation scripts in W4 and W8 catch the quality problems early; 40% of W10 for fixes; 3-week buffer |
+| Three projects at 5–10 h per week                              | Long overall timeline                                                                             | This plan is independent of the other two and can start whenever you choose                           |

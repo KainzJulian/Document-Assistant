@@ -1,1 +1,102 @@
 @import "tailwindcss";
+
+/*
+ * Design tokens (see ~/.claude/brain/Document Assistant/design-system.md).
+ * NOTE: Components use semantic utilities (bg-surface, text-muted, ...), never raw hex.
+ * Dark theme = class "dark" on <html>, set from the system preference in index.html.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #f8fafc;
+  --surface: #ffffff;
+  --surface-muted: #f1f5f9;
+  --border: #cbd5e1;
+  --border-strong: #64748b;
+  --foreground: #0f172a;
+  --muted: #475569;
+  --primary: #1d4ed8;
+  --on-primary: #ffffff;
+  --primary-soft: #dbeafe;
+  --success: #15803d;
+  --success-soft: #dcfce7;
+  --warning: #b45309;
+  --warning-soft: #fef3c7;
+  --danger: #b91c1c;
+  --danger-soft: #fee2e2;
+  --overlay: rgb(15 23 42 / 0.5);
+  color-scheme: light;
+}
+
+:root.dark {
+  --background: #0b1220;
+  --surface: #111a2e;
+  --surface-muted: #18233b;
+  --border: #33415c;
+  --border-strong: #7d8fae;
+  --foreground: #e6edf7;
+  --muted: #9fb0c8;
+  --primary: #60a5fa;
+  --on-primary: #0b1220;
+  --primary-soft: #1e3a5f;
+  --success: #4ade80;
+  --success-soft: #14341f;
+  --warning: #fbbf24;
+  --warning-soft: #3b2a0a;
+  --danger: #f87171;
+  --danger-soft: #3d1818;
+  --overlay: rgb(0 0 0 / 0.65);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-primary-soft: var(--primary-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-overlay: var(--overlay);
+
+  /* System fonts only: no external font requests from a home network app. */
+  --font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+
+  --radius-control: 0.5rem;
+  --radius-card: 0.75rem;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
+    background: var(--background);
+    color: var(--foreground);
+  }
+
+  /* Visible focus for keyboard users on every interactive element. */
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
