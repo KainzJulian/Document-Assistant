@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.db.models import Document, User
 from app.errors import ApiError
+from app.services.filetypes import KINDS
 
 Scope = Literal["all", "mine", "shared"]
 
@@ -38,7 +39,7 @@ def visible_query(user: User) -> Select[Document, str]:
 
 
 def list_visible(
-    db: Session, user: User, q: str = "", status: str = "", scope: Scope = "all"
+    db: Session, user: User, q: str = "", status: str = "", scope: Scope = "all", kind: str = ""
 ) -> list[tuple[Document, str]]:
     """List visible documents, newest first.
 
@@ -48,6 +49,7 @@ def list_visible(
         q: Title search (case-insensitive substring).
         status: Only this status, if given.
         scope: ``mine``, ``shared`` (others' shared documents) or ``all``.
+        kind: Only this document type (``pdf``, ``docx``, ``url`` ...).
 
     Returns:
         Pairs of document and owner display name.
@@ -58,6 +60,10 @@ def list_visible(
         query = query.where(Document.title.ilike(f"%{escaped}%", escape="\\"))
     if status:
         query = query.where(Document.status == status)
+    if kind in ("url", "text"):
+        query = query.where(Document.source_type == kind)
+    elif kind in KINDS:
+        query = query.where(Document.source_type == "file", Document.mime == KINDS[kind].mime)
     if scope == "mine":
         query = query.where(Document.owner_id == user.id)
     elif scope == "shared":

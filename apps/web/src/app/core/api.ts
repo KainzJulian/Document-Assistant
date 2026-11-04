@@ -11,6 +11,12 @@ export type User = Schemas['UserOut'];
 export type UserCreate = Schemas['UserCreate'];
 /** Body to change a user. */
 export type UserPatch = Schemas['UserPatch'];
+/** Body to rename or share a document. */
+export type DocumentPatch = Schemas['DocumentPatch'];
+/** A library document. */
+export type DocumentOut = Schemas['DocumentOut'];
+/** Extracted text of a document. */
+export type DocumentTextOut = Schemas['DocumentTextOut'];
 /** Login credentials. */
 export type LoginRequest = Schemas['LoginRequest'];
 
@@ -97,6 +103,15 @@ export class ApiClient {
    */
   post<T>(path: string, body?: unknown): Promise<T> {
     return this.request<T>('POST', path, body);
+  }
+
+  /**
+   * DELETE a resource.
+   * @param path - Path below `/api`.
+   * @returns Nothing (the API answers 204).
+   */
+  delete(path: string): Promise<void> {
+    return this.request<void>('DELETE', path);
   }
 
   /**

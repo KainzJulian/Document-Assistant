@@ -105,7 +105,12 @@ async def upload(files: list[UploadFile], user: CurrentUser, db: DbSession) -> l
 
 @router.get("")
 def list_documents(
-    user: CurrentUser, db: DbSession, q: str = "", status: str = "", scope: Scope = "all"
+    user: CurrentUser,
+    db: DbSession,
+    q: str = "",
+    status: str = "",
+    scope: Scope = "all",
+    kind: str = "",
 ) -> list[DocumentOut]:
     """List the documents the person may see, newest first.
 
@@ -115,11 +120,14 @@ def list_documents(
         q: Title search.
         status: Only this status.
         scope: ``mine``, ``shared`` (shared with me) or ``all``.
+        kind: Only this document type.
 
     Returns:
         The documents.
     """
-    return [to_out(d, name, user.id) for d, name in repo.list_visible(db, user, q, status, scope)]
+    return [
+        to_out(d, name, user.id) for d, name in repo.list_visible(db, user, q, status, scope, kind)
+    ]
 
 
 def _changed_since(user_id: uuid.UUID, since: datetime) -> list[DocumentOut]:
