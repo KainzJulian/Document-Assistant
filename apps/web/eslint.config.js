@@ -70,17 +70,6 @@ module.exports = defineConfig([
     extends: [angular.configs.templateRecommended, angular.configs.templateAccessibility],
     rules: {},
   },
-  // INFO: Temporary shell prototypes and their switcher; delete this block with the folders.
-  {
-    files: ["src/prototypes/**", "src/dev/**"],
-    rules: {
-      "@angular-eslint/component-selector": "off",
-      "@angular-eslint/template/click-events-have-key-events": "off",
-      "@angular-eslint/template/interactive-supports-focus": "off",
-      "no-useless-assignment": "off",
-      "jsdoc/require-param": "off",
-    },
-  },
   // Atomic design: lower layers never import higher layers, and only pages use stores.
   {
     files: ["src/app/ui/atoms/**/*.ts"],

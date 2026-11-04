@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { de } from '../../../core/i18n/de';
 
 /** Small rotating ring for loading states; inherits the text colour. */
 @Component({
@@ -16,5 +17,5 @@ export class SpinnerComponent {
   /** Diameter in pixels. */
   readonly size = input(16);
   /** Text read by screen readers. */
-  readonly label = input('Wird geladen');
+  readonly label = input<string>(de.common.loading);
 }

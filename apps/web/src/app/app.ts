@@ -1,18 +1,22 @@
-import { Component, isDevMode } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { PrototypesHost } from '../prototypes/prototypes-host';
+import { ToastService } from './core/toast.service';
+import { ToastComponent } from './ui/molecules/toast/toast.component';
 
-/** Root component. Hosts the router outlet; layout lives in the app-shell template. */
+/** Root component: the router outlet and the toast messages that float above every page. */
 @Component({
-  imports: [RouterOutlet, PrototypesHost],
+  imports: [RouterOutlet, ToastComponent],
   selector: 'app-root',
-  // INFO: Temporary. In development the shell prototypes replace the router until a design is chosen.
-  template: `@if (prototypes) {
-    <app-prototypes />
-  } @else {
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
     <router-outlet />
-  }`,
+    <div class="fixed right-4 bottom-4 z-50 w-[calc(100%-2rem)] max-w-sm space-y-2">
+      @for (toast of toasts.toasts(); track toast.id) {
+        <app-toast [tone]="toast.tone" [message]="toast.message" (dismissed)="toasts.dismiss(toast.id)" />
+      }
+    </div>
+  `,
 })
 export class App {
-  protected readonly prototypes = isDevMode();
+  protected readonly toasts = inject(ToastService);
 }

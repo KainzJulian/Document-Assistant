@@ -1,52 +1,52 @@
 @import "tailwindcss";
-@import "./prototypes/themes.css"; /* INFO: temporary, remove with src/prototypes/ */
 
 /*
- * Design tokens (see ~/.claude/brain/Document Assistant/design-system.md).
+ * Design tokens, "Salbei": fresh sage and green, soft and round, no icons.
+ * See ~/.claude/brain/Document Assistant/design-system.md.
  * NOTE: Components use semantic utilities (bg-surface, text-muted, ...), never raw hex.
- * Dark theme = class "dark" on <html>, set from the system preference in index.html.
+ * Dark theme = class "dark" on <html> (ThemeService, first paint in index.html).
  */
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #f8fafc;
+  --background: #f6f8f5;
   --surface: #ffffff;
-  --surface-muted: #f1f5f9;
-  --border: #cbd5e1;
-  --border-strong: #64748b;
-  --foreground: #0f172a;
-  --muted: #475569;
-  --primary: #1d4ed8;
+  --surface-muted: #eef2ec;
+  --border: #dde4da;
+  --border-strong: #78887a;
+  --foreground: #1b241d;
+  --muted: #556257;
+  --primary: #1f7a4d;
   --on-primary: #ffffff;
-  --primary-soft: #dbeafe;
-  --success: #15803d;
-  --success-soft: #dcfce7;
-  --warning: #b45309;
-  --warning-soft: #fef3c7;
-  --danger: #b91c1c;
-  --danger-soft: #fee2e2;
-  --overlay: rgb(15 23 42 / 0.5);
+  --primary-soft: #dff1e6;
+  --success: #1f7a4d;
+  --success-soft: #dff1e6;
+  --warning: #8a5a00;
+  --warning-soft: #fdf0cf;
+  --danger: #b3261e;
+  --danger-soft: #fbe4e1;
+  --overlay: rgb(20 30 22 / 0.45);
   color-scheme: light;
 }
 
 :root.dark {
-  --background: #0b1220;
-  --surface: #111a2e;
-  --surface-muted: #18233b;
-  --border: #33415c;
-  --border-strong: #7d8fae;
-  --foreground: #e6edf7;
-  --muted: #9fb0c8;
-  --primary: #60a5fa;
-  --on-primary: #0b1220;
-  --primary-soft: #1e3a5f;
-  --success: #4ade80;
-  --success-soft: #14341f;
-  --warning: #fbbf24;
-  --warning-soft: #3b2a0a;
-  --danger: #f87171;
-  --danger-soft: #3d1818;
-  --overlay: rgb(0 0 0 / 0.65);
+  --background: #0f1511;
+  --surface: #161e18;
+  --surface-muted: #1e2820;
+  --border: #2b372e;
+  --border-strong: #829586;
+  --foreground: #e8efe9;
+  --muted: #a3b3a6;
+  --primary: #5fd08f;
+  --on-primary: #0b1a11;
+  --primary-soft: #1c3a28;
+  --success: #5fd08f;
+  --success-soft: #1c3a28;
+  --warning: #f2c14e;
+  --warning-soft: #3a2d0c;
+  --danger: #ff8a80;
+  --danger-soft: #3d1b18;
+  --overlay: rgb(0 0 0 / 0.6);
   color-scheme: dark;
 }
 
@@ -73,8 +73,8 @@
   --font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", serif;
 
-  --radius-control: 0.5rem;
-  --radius-card: 0.75rem;
+  --radius-control: 10px;
+  --radius-card: 16px;
 }
 
 @layer base {
