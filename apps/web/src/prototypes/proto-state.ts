@@ -18,6 +18,8 @@ export class ProtoState {
   readonly screen = signal<ProtoScreen>('new');
   /** Whether the Ollama warning dialog is open. */
   readonly dialogOpen = signal(false);
+  /** Whether the history panel is open (variants with a top bar). */
+  readonly historyOpen = signal(false);
   /** Whether the mobile drawer is open. */
   readonly drawerOpen = signal(false);
   /** Ids of the documents selected for the chat. */

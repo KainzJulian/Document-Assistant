@@ -1,0 +1,183 @@
+/*
+ * Prototype themes: each variant overrides the semantic tokens inside its own wrapper class.
+ * Extra tokens: --r-control / --r-card (corner radii), --font-display (headings),
+ * --side-* (sidebar or panel colours).
+ * INFO: Temporary; delete with src/prototypes/ once a design is chosen.
+ */
+
+/* 1. Salbei: fresh sage and green, soft and round. */
+.theme-salbei {
+  --background: #f6f8f5;
+  --surface: #ffffff;
+  --surface-muted: #eef2ec;
+  --border: #dde4da;
+  --border-strong: #78887a;
+  --foreground: #1b241d;
+  --muted: #556257;
+  --primary: #1f7a4d;
+  --on-primary: #ffffff;
+  --primary-soft: #dff1e6;
+  --success: #1f7a4d;
+  --success-soft: #dff1e6;
+  --warning: #8a5a00;
+  --warning-soft: #fdf0cf;
+  --danger: #b3261e;
+  --danger-soft: #fbe4e1;
+  --overlay: rgb(20 30 22 / 0.45);
+  --r-control: 10px;
+  --r-card: 16px;
+  --font-display: ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --side-bg: #ffffff;
+  --side-fg: #1b241d;
+  --side-muted: #556257;
+  --side-border: #dde4da;
+  --side-hover: #eef2ec;
+  --side-active: #dff1e6;
+  --side-active-fg: #1f7a4d;
+  color-scheme: light;
+}
+.dark .theme-salbei {
+  --background: #0f1511;
+  --surface: #161e18;
+  --surface-muted: #1e2820;
+  --border: #2b372e;
+  --border-strong: #829586;
+  --foreground: #e8efe9;
+  --muted: #a3b3a6;
+  --primary: #5fd08f;
+  --on-primary: #0b1a11;
+  --primary-soft: #1c3a28;
+  --success: #5fd08f;
+  --success-soft: #1c3a28;
+  --warning: #f2c14e;
+  --warning-soft: #3a2d0c;
+  --danger: #ff8a80;
+  --danger-soft: #3d1b18;
+  --overlay: rgb(0 0 0 / 0.6);
+  --side-bg: #121a14;
+  --side-fg: #e8efe9;
+  --side-muted: #a3b3a6;
+  --side-border: #2b372e;
+  --side-hover: #1e2820;
+  --side-active: #1c3a28;
+  --side-active-fg: #5fd08f;
+  color-scheme: dark;
+}
+
+/* 2. Tinte: warm paper, black ink, one vermilion accent; sharp corners, serif headings. */
+.theme-tinte {
+  --background: #faf6ef;
+  --surface: #fffdf9;
+  --surface-muted: #f1ebdf;
+  --border: #e4dccb;
+  --border-strong: #857a64;
+  --foreground: #1d1a16;
+  --muted: #5e564a;
+  --primary: #c2410c;
+  --on-primary: #ffffff;
+  --primary-soft: #fbe5d6;
+  --success: #2f6b3a;
+  --success-soft: #e3f0df;
+  --warning: #8a5a00;
+  --warning-soft: #fbecc8;
+  --danger: #a4262c;
+  --danger-soft: #f9e1df;
+  --overlay: rgb(29 26 22 / 0.5);
+  --r-control: 4px;
+  --r-card: 6px;
+  --font-display: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  --side-bg: #fffdf9;
+  --side-fg: #1d1a16;
+  --side-muted: #5e564a;
+  --side-border: #e4dccb;
+  --side-hover: #f1ebdf;
+  --side-active: #fbe5d6;
+  --side-active-fg: #c2410c;
+  color-scheme: light;
+}
+.dark .theme-tinte {
+  --background: #17140f;
+  --surface: #1f1b15;
+  --surface-muted: #2a251d;
+  --border: #3a3327;
+  --border-strong: #968a6c;
+  --foreground: #f1ebdf;
+  --muted: #b5aa94;
+  --primary: #f08a52;
+  --on-primary: #1d1209;
+  --primary-soft: #3d2415;
+  --success: #86c98f;
+  --success-soft: #1c3320;
+  --warning: #f2c14e;
+  --warning-soft: #3a2d0c;
+  --danger: #ff8f87;
+  --danger-soft: #3d1b18;
+  --overlay: rgb(0 0 0 / 0.65);
+  --side-bg: #1f1b15;
+  --side-fg: #f1ebdf;
+  --side-muted: #b5aa94;
+  --side-border: #3a3327;
+  --side-hover: #2a251d;
+  --side-active: #3d2415;
+  --side-active-fg: #f08a52;
+  color-scheme: dark;
+}
+
+/* 3. Lagune: deep teal sidebar, bright content, big rounded cards. */
+.theme-lagune {
+  --background: #f1f6f7;
+  --surface: #ffffff;
+  --surface-muted: #e6eff1;
+  --border: #d6e3e6;
+  --border-strong: #6a8690;
+  --foreground: #10222a;
+  --muted: #4b6570;
+  --primary: #0f766e;
+  --on-primary: #ffffff;
+  --primary-soft: #d3eeea;
+  --success: #166b4a;
+  --success-soft: #d9f0e6;
+  --warning: #8a5a00;
+  --warning-soft: #fdf0cf;
+  --danger: #b3261e;
+  --danger-soft: #fbe4e1;
+  --overlay: rgb(8 30 36 / 0.55);
+  --r-control: 14px;
+  --r-card: 22px;
+  --font-display: ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --side-bg: #0d2b33;
+  --side-fg: #e9f4f5;
+  --side-muted: #9cc0c6;
+  --side-border: #1d4651;
+  --side-hover: #16414c;
+  --side-active: #1d5a66;
+  --side-active-fg: #ffffff;
+  color-scheme: light;
+}
+.dark .theme-lagune {
+  --background: #0a1417;
+  --surface: #111d21;
+  --surface-muted: #182a30;
+  --border: #223a42;
+  --border-strong: #7ea0aa;
+  --foreground: #e6f1f3;
+  --muted: #9bb8c0;
+  --primary: #4fd1c5;
+  --on-primary: #06211f;
+  --primary-soft: #14383a;
+  --success: #6fd6a4;
+  --success-soft: #14352a;
+  --warning: #f2c14e;
+  --warning-soft: #3a2d0c;
+  --danger: #ff8f87;
+  --danger-soft: #3d1b18;
+  --overlay: rgb(0 0 0 / 0.65);
+  --side-bg: #07161a;
+  --side-fg: #e6f1f3;
+  --side-muted: #8fb0b8;
+  --side-border: #17323a;
+  --side-hover: #102a31;
+  --side-active: #14383a;
+  --side-active-fg: #4fd1c5;
+  color-scheme: dark;
+}

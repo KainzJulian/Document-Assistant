@@ -1,33 +1,65 @@
 import { ChangeDetectionStrategy, Component, ElementRef, computed, effect, inject, input, viewChild } from '@angular/core';
-import { ButtonComponent } from '../app/ui/atoms/button/button.component';
-import { ChipComponent } from '../app/ui/atoms/chip/chip.component';
-import { IconComponent } from '../app/ui/atoms/icon/icon.component';
 import { CHATS, DocStatus, MODELS, ProtoModel, STATUS } from './proto-data';
 import { ProtoState } from './proto-state';
 
-/** Chip that shows a document's processing status. */
+/*
+ * Shared building blocks. No icons on purpose: text labels and colour dots only.
+ * Colours, radii and fonts come from the variant's tokens (themes.css).
+ */
+
+const BTN =
+  'inline-flex min-h-10 cursor-pointer items-center justify-center rounded-(--r-control) px-4 text-sm font-medium transition-colors duration-150 pointer-coarse:min-h-11 disabled:cursor-not-allowed disabled:opacity-50 ';
+
+/** Filled main action. */
+export const BTN_PRIMARY = BTN + 'bg-primary text-on-primary hover:opacity-90';
+/** Outlined secondary action. */
+export const BTN_SECONDARY = BTN + 'border border-border-strong bg-surface text-foreground hover:bg-surface-muted';
+/** Text-only action. */
+export const BTN_QUIET = BTN + 'text-foreground hover:bg-surface-muted';
+/** Text input. */
+export const INPUT =
+  'min-h-10 w-full rounded-(--r-control) border border-border-strong bg-surface px-3 text-base placeholder:text-muted pointer-coarse:min-h-11';
+/** Round citation number inside an answer. */
+export const CITE =
+  'ml-0.5 inline-block min-w-5 cursor-pointer rounded-full bg-primary-soft px-1.5 text-center align-baseline text-xs font-semibold text-primary hover:opacity-80 pointer-coarse:min-w-8 pointer-coarse:py-1';
+
+const TONE_TEXT: Record<string, string> = {
+  neutral: 'text-muted',
+  info: 'text-primary',
+  success: 'text-success',
+  warning: 'text-warning',
+  danger: 'text-danger',
+};
+const TONE_DOT: Record<string, string> = {
+  neutral: 'bg-border-strong',
+  info: 'bg-primary animate-pulse',
+  success: 'bg-success',
+  warning: 'bg-warning',
+  danger: 'bg-danger',
+};
+
+/** Document status as a coloured dot plus text. */
 @Component({
   selector: 'proto-status',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ChipComponent],
-  template: `<app-chip [tone]="s().tone" [busy]="s().busy" [icon]="icon()">{{ s().label }}</app-chip>`,
+  template: `<span class="inline-flex items-center gap-1.5 text-sm font-medium" [class]="text()">
+    <span class="size-2 rounded-full" [class]="dot()"></span>{{ s().label }}
+  </span>`,
 })
 export class ProtoStatus {
   /** Status to show. */
   readonly status = input.required<DocStatus>();
   protected readonly s = computed(() => STATUS[this.status()]);
-  protected readonly icon = computed(() =>
-    this.status() === 'ready' ? 'check' : this.status() === 'failed' ? 'alert-triangle' : null,
-  );
+  protected readonly text = computed(() => TONE_TEXT[this.s().tone]);
+  protected readonly dot = computed(() => TONE_DOT[this.s().tone]);
 }
 
-/** Question input with send button. */
+/** Question input with a plain "Senden" button. */
 @Component({
   selector: 'proto-composer',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconComponent],
   template: `<form
-    class="rounded-card border border-border-strong bg-surface p-2 shadow-sm focus-within:outline-2 focus-within:outline-primary"
+    class="rounded-(--r-card) border border-border-strong bg-surface p-2 shadow-sm focus-within:outline-2 focus-within:outline-primary"
     (submit)="$event.preventDefault()"
   >
     <label class="sr-only" for="proto-msg">Frage an die Dokumente</label>
@@ -35,41 +67,36 @@ export class ProtoStatus {
       id="proto-msg"
       rows="2"
       class="w-full resize-none bg-transparent p-2 text-base outline-none placeholder:text-muted"
-      placeholder="Stelle eine Frage zu deinen Dokumenten …"
+      placeholder="Frage zu deinen Dokumenten …"
     ></textarea>
-    <div class="flex items-center justify-between gap-2 px-1 pb-0.5">
+    <div class="flex items-center justify-between gap-3 px-1 pb-1">
       <span class="truncate text-xs text-muted">{{ hint() }}</span>
-      <button
-        type="submit"
-        aria-label="Senden"
-        class="grid size-10 shrink-0 cursor-pointer place-items-center rounded-full bg-primary text-on-primary transition-opacity hover:opacity-90 pointer-coarse:size-11"
-      >
-        <app-icon name="arrow-up" [size]="20" />
-      </button>
+      <button type="submit" [class]="send">Senden</button>
     </div>
   </form>`,
 })
 export class ProtoComposer {
-  /** Small text next to the send button. */
+  /** Small text next to the button. */
   readonly hint = input('Antworten nutzen nur die ausgewählten Dokumente.');
+  protected readonly send = BTN_PRIMARY;
 }
 
-/** Chats grouped by date, as in the sidebar. */
+/** Chats grouped by date. Uses the sidebar tokens so it fits light and dark sidebars. */
 @Component({
   selector: 'proto-chat-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<nav aria-label="Chats">
     @for (g of groups; track g.name) {
-      <h3 class="px-3 pt-3 pb-1 text-xs font-semibold tracking-wide text-muted uppercase">{{ g.name }}</h3>
+      <h3 class="px-3 pt-4 pb-1 text-xs font-medium text-(--side-muted)">{{ g.name }}</h3>
       <ul>
         @for (c of g.items; track c.id) {
           <li>
             <button
               type="button"
-              class="group flex w-full cursor-pointer items-center gap-2 rounded-control px-3 text-left text-sm transition-colors hover:bg-surface-muted"
-              [class]="(dense() ? 'min-h-8 ' : 'min-h-10 ') + (isActive(c.id) ? 'bg-primary-soft font-medium text-primary hover:bg-primary-soft' : 'text-foreground')"
+              class="flex min-h-9 w-full cursor-pointer items-center rounded-(--r-control) px-3 text-left text-sm transition-colors pointer-coarse:min-h-11"
+              [class]="isActive(c.id) ? 'bg-(--side-active) font-medium text-(--side-active-fg)' : 'text-(--side-fg) hover:bg-(--side-hover)'"
               [attr.aria-current]="isActive(c.id) ? 'page' : null"
-              (click)="state.go('chat')"
+              (click)="state.go('chat'); state.historyOpen.set(false)"
             >
               <span class="truncate">{{ c.title }}</span>
             </button>
@@ -81,8 +108,6 @@ export class ProtoComposer {
 })
 export class ProtoChatList {
   protected readonly state = inject(ProtoState);
-  /** Tighter rows. */
-  readonly dense = input(false);
   protected readonly groups = ['Heute', 'Gestern', 'Letzte 7 Tage', 'Älter']
     .map((name) => ({ name, items: CHATS.filter((c) => c.group === name) }))
     .filter((g) => g.items.length > 0);
@@ -101,22 +126,19 @@ export class ProtoChatList {
 @Component({
   selector: 'proto-settings',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconComponent, ChipComponent, ButtonComponent],
   template: `
     <section aria-labelledby="s-model" class="space-y-3">
-      <h2 id="s-model" class="text-lg font-semibold">KI-Modell</h2>
+      <h2 id="s-model" class="font-(family-name:--font-display) text-xl font-semibold">KI-Modell</h2>
       <p class="text-sm text-muted">Dieses Modell beantwortet deine Fragen und schreibt Zusammenfassungen.</p>
       @for (group of groups; track group.name) {
         <div role="radiogroup" [attr.aria-label]="group.name" class="space-y-2">
-          <h3 class="flex items-center gap-2 pt-2 text-xs font-semibold tracking-wide text-muted uppercase">
-            <app-icon [name]="group.name === 'Cloud' ? 'cloud' : 'cpu'" [size]="14" />{{ group.name }}
-          </h3>
+          <h3 class="pt-3 text-sm font-medium text-muted">{{ group.name }}</h3>
           @for (m of group.models; track m.id) {
             <button
               type="button"
               role="radio"
               [attr.aria-checked]="state.modelId() === m.id"
-              class="flex min-h-12 w-full cursor-pointer items-center gap-3 rounded-card border bg-surface px-4 py-2 text-left transition-colors hover:bg-surface-muted"
+              class="flex min-h-12 w-full cursor-pointer items-center gap-3 rounded-(--r-card) border bg-surface px-4 py-2 text-left transition-colors hover:bg-surface-muted"
               [class]="state.modelId() === m.id ? 'border-primary ring-1 ring-primary' : 'border-border'"
               (click)="pick(m)"
             >
@@ -128,7 +150,7 @@ export class ProtoChatList {
                 <span class="block text-xs text-muted">{{ m.provider }}</span>
               </span>
               @if (m.verdict; as v) {
-                <app-chip [tone]="v.tone" icon="alert-triangle">{{ v.label }}</app-chip>
+                <span class="rounded-full px-2.5 py-0.5 text-xs font-medium" [class]="v.tone === 'danger' ? 'bg-danger-soft text-danger' : 'bg-warning-soft text-warning'">{{ v.label }}</span>
               }
             </button>
           }
@@ -136,26 +158,28 @@ export class ProtoChatList {
       }
     </section>
 
-    <section aria-labelledby="s-sum" class="mt-8 space-y-3">
-      <h2 id="s-sum" class="text-lg font-semibold">Zusammenfassungen</h2>
-      <div role="radiogroup" aria-label="Sprache der Zusammenfassung" class="inline-flex rounded-control border border-border-strong bg-surface p-1">
-        <button type="button" role="radio" aria-checked="true" class="min-h-9 cursor-pointer rounded-md bg-primary px-4 text-sm font-medium text-on-primary pointer-coarse:min-h-11">Wie die Quelle</button>
-        <button type="button" role="radio" aria-checked="false" class="min-h-9 cursor-pointer rounded-md px-4 text-sm font-medium text-foreground hover:bg-surface-muted pointer-coarse:min-h-11">Deutsch</button>
+    <section aria-labelledby="s-sum" class="mt-10 space-y-3">
+      <h2 id="s-sum" class="font-(family-name:--font-display) text-xl font-semibold">Zusammenfassungen</h2>
+      <div role="radiogroup" aria-label="Sprache der Zusammenfassung" class="inline-flex rounded-(--r-control) border border-border-strong bg-surface p-1">
+        <button type="button" role="radio" aria-checked="true" class="min-h-9 cursor-pointer rounded-(--r-control) bg-primary px-4 text-sm font-medium text-on-primary pointer-coarse:min-h-11">Wie die Quelle</button>
+        <button type="button" role="radio" aria-checked="false" class="min-h-9 cursor-pointer rounded-(--r-control) px-4 text-sm font-medium hover:bg-surface-muted pointer-coarse:min-h-11">Deutsch</button>
       </div>
     </section>
 
-    <section aria-labelledby="s-acc" class="mt-8 space-y-3">
-      <h2 id="s-acc" class="text-lg font-semibold">Konto</h2>
+    <section aria-labelledby="s-acc" class="mt-10 space-y-3">
+      <h2 id="s-acc" class="font-(family-name:--font-display) text-xl font-semibold">Konto</h2>
       <div class="max-w-sm space-y-1.5">
         <label for="s-name" class="text-sm font-medium">Anzeigename</label>
-        <input id="s-name" value="Julian" class="min-h-10 w-full rounded-control border border-border-strong bg-surface px-3 text-base pointer-coarse:min-h-11" />
+        <input id="s-name" value="Julian" [class]="input" />
       </div>
-      <app-button variant="secondary" icon="settings">Passwort ändern</app-button>
+      <button type="button" [class]="secondary">Passwort ändern</button>
     </section>
   `,
 })
 export class ProtoSettings {
   protected readonly state = inject(ProtoState);
+  protected readonly input = INPUT;
+  protected readonly secondary = BTN_SECONDARY;
   protected readonly groups = (['Lokal (Ollama)', 'Cloud'] as const).map((name) => ({
     name,
     models: MODELS.filter((m) => m.group === name),
@@ -179,38 +203,37 @@ export class ProtoSettings {
 @Component({
   selector: 'proto-ollama-dialog',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ButtonComponent, ChipComponent, IconComponent],
   template: `<dialog
     #dlg
-    class="m-auto w-[calc(100%-2rem)] max-w-md rounded-card border border-border bg-surface p-0 text-foreground shadow-xl backdrop:bg-overlay"
+    class="m-auto w-[calc(100%-2rem)] max-w-md rounded-(--r-card) border border-border bg-surface p-0 text-foreground shadow-xl backdrop:bg-overlay"
     aria-labelledby="ollama-title"
     (close)="state.dialogOpen.set(false)"
     (click)="onBackdrop($event)"
   >
     <div class="space-y-4 p-6">
-      <div class="flex items-start gap-3">
-        <span class="grid size-10 shrink-0 place-items-center rounded-full bg-warning-soft text-warning"><app-icon name="alert-triangle" /></span>
-        <div>
-          <h2 id="ollama-title" class="text-lg font-semibold">Keine GPU – Antworten sehr langsam</h2>
-          <p class="mt-1 text-sm text-muted">{{ model().name }} läuft nur auf der CPU (geschätzt ca. 4 Wörter pro Sekunde).</p>
-        </div>
+      <div>
+        <p class="mb-1 text-sm font-medium text-warning">Nur CPU</p>
+        <h2 id="ollama-title" class="font-(family-name:--font-display) text-xl leading-snug font-semibold">Keine GPU – Antworten sehr langsam</h2>
+        <p class="mt-2 text-sm text-muted">{{ model().name }} läuft nur auf der CPU, geschätzt etwa 4 Wörter pro Sekunde.</p>
       </div>
-      <dl class="divide-y divide-border rounded-control border border-border text-sm">
+      <dl class="divide-y divide-border rounded-(--r-control) border border-border text-sm">
         <div class="flex justify-between gap-4 px-3 py-2"><dt class="text-muted">Server-RAM</dt><dd>16 GB gesamt, 11,2 GB frei</dd></div>
-        <div class="flex justify-between gap-4 px-3 py-2"><dt class="text-muted">GPU</dt><dd>keine GPU</dd></div>
+        <div class="flex justify-between gap-4 px-3 py-2"><dt class="text-muted">GPU</dt><dd>keine</dd></div>
         <div class="flex justify-between gap-4 px-3 py-2"><dt class="text-muted">Geschätzter Bedarf</dt><dd>5,9 GB</dd></div>
-        <div class="flex items-center justify-between gap-4 px-3 py-2"><dt class="text-muted">Ergebnis</dt><dd><app-chip tone="warning" icon="alert-triangle">Nur CPU</app-chip></dd></div>
       </dl>
-      <app-button variant="ghost" size="sm" icon="cpu">Geschwindigkeit testen</app-button>
+      <button type="button" [class]="quiet">Geschwindigkeit testen</button>
     </div>
     <div class="flex flex-wrap justify-end gap-2 border-t border-border bg-surface-muted px-6 py-4">
-      <app-button variant="secondary" (click)="state.dialogOpen.set(false)">Abbrechen</app-button>
-      <app-button variant="primary" (click)="accept()">Trotzdem verwenden</app-button>
+      <button type="button" [class]="secondary" (click)="state.dialogOpen.set(false)">Abbrechen</button>
+      <button type="button" [class]="primary" (click)="accept()">Trotzdem verwenden</button>
     </div>
   </dialog>`,
 })
 export class ProtoOllamaDialog {
   protected readonly state = inject(ProtoState);
+  protected readonly primary = BTN_PRIMARY;
+  protected readonly secondary = BTN_SECONDARY;
+  protected readonly quiet = BTN_QUIET;
   private readonly dlg = viewChild.required<ElementRef<HTMLDialogElement>>('dlg');
   protected readonly model = computed(() => MODELS.find((m) => m.id === this.state.pendingModelId()) ?? MODELS[0]);
 
@@ -239,15 +262,3 @@ export class ProtoOllamaDialog {
     if (event.target === this.dlg().nativeElement) this.state.dialogOpen.set(false);
   }
 }
-
-/** Class string for square icon-only buttons (44 px on touch screens). */
-export const ICON_BTN =
-  'grid size-10 shrink-0 cursor-pointer place-items-center rounded-control text-foreground transition-colors duration-150 hover:bg-surface-muted pointer-coarse:size-11';
-
-/** Class string for the round citation marker inside answers. */
-export const CITE_BTN =
-  'mx-0.5 inline-grid h-6 min-w-6 cursor-pointer place-items-center rounded-full bg-primary-soft px-1.5 align-baseline text-xs font-semibold text-primary transition-opacity hover:opacity-80 pointer-coarse:h-8 pointer-coarse:min-w-8';
-
-/** Class string for text inputs. */
-export const INPUT =
-  'min-h-10 w-full rounded-control border border-border-strong bg-surface px-3 text-base placeholder:text-muted pointer-coarse:min-h-11';

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./prototypes/themes.css"; /* INFO: temporary, remove with src/prototypes/ */
 
 /*
  * Design tokens (see ~/.claude/brain/Document Assistant/design-system.md).

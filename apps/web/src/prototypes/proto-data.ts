@@ -1,5 +1,5 @@
-import { ChipTone } from '../app/ui/atoms/chip/chip.component';
-import { IconName } from '../app/ui/atoms/icon/icon.component';
+/** Colour meaning of a status or verdict. */
+export type ChipTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
 
 /** Processing state of a document. */
 export type DocStatus = 'ready' | 'reading' | 'indexing' | 'queued' | 'failed';
@@ -24,15 +24,6 @@ export const STATUS: Record<DocStatus, { label: string; tone: ChipTone; busy: bo
   indexing: { label: 'Wird indexiert', tone: 'info', busy: true },
   queued: { label: 'Wartet', tone: 'neutral', busy: false },
   failed: { label: 'Fehler', tone: 'danger', busy: false },
-};
-
-/** Icon per document type. */
-export const TYPE_ICON: Record<ProtoDoc['type'], IconName> = {
-  PDF: 'file-text',
-  DOCX: 'file-text',
-  PPTX: 'presentation',
-  URL: 'link',
-  EPUB: 'book',
 };
 
 /** Mock library. */
