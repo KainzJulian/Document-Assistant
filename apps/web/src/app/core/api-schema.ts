@@ -184,10 +184,310 @@ export interface paths {
         patch: operations["patch_user_api_users__user_id__patch"];
         trace?: never;
     };
+    "/api/documents/upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload
+         * @description Upload one or more files. Each file gets its own result; one bad file does not stop the rest.
+         *
+         *     Args:
+         *         files: The files (multipart).
+         *         user: The logged-in person.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         One result per file: created, duplicate or rejected with a German reason.
+         */
+        post: operations["upload_api_documents_upload_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Documents
+         * @description List the documents the person may see, newest first.
+         *
+         *     Args:
+         *         user: The logged-in person.
+         *         db: Database session.
+         *         q: Title search.
+         *         status: Only this status.
+         *         scope: ``mine``, ``shared`` (shared with me) or ``all``.
+         *
+         *     Returns:
+         *         The documents.
+         */
+        get: operations["list_documents_api_documents_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/documents/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Events
+         * @description Server-Sent Events: a ``document`` event whenever one of the person's documents changes.
+         *
+         *     The library loads the list first and then listens here, so changes show without reloading.
+         *     Polls the database once a second (NOTE: switch to LISTEN/NOTIFY if this ever matters).
+         *
+         *     Args:
+         *         request: The request, used to notice when the browser disconnects.
+         *         user: The logged-in person.
+         *
+         *     Returns:
+         *         An ``text/event-stream`` response.
+         */
+        get: operations["events_api_documents_events_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/documents/{document_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Document
+         * @description Return one visible document.
+         *
+         *     Args:
+         *         document_id: Id of the document.
+         *         user: The logged-in person.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The document.
+         */
+        get: operations["get_document_api_documents__document_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete Document
+         * @description Delete a document with its file, text, chunks, vectors and summaries (owner only).
+         *
+         *     Args:
+         *         document_id: Id of the document.
+         *         user: The logged-in person.
+         *         db: Database session.
+         */
+        delete: operations["delete_document_api_documents__document_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Patch Document
+         * @description Rename a document or change whether it is shared (owner only).
+         *
+         *     Args:
+         *         document_id: Id of the document.
+         *         body: Fields to change.
+         *         user: The logged-in person.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The updated document.
+         */
+        patch: operations["patch_document_api_documents__document_id__patch"];
+        trace?: never;
+    };
+    "/api/documents/{document_id}/text": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Text
+         * @description Return the extracted text (Markdown with page markers).
+         *
+         *     Args:
+         *         document_id: Id of the document.
+         *         user: The logged-in person.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The text.
+         *
+         *     Raises:
+         *         ApiError: 404 if the document has no text yet.
+         */
+        get: operations["get_text_api_documents__document_id__text_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/documents/{document_id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get File
+         * @description Download the original file.
+         *
+         *     Args:
+         *         document_id: Id of the document.
+         *         user: The logged-in person.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The file as an attachment.
+         *
+         *     Raises:
+         *         ApiError: 404 if the document has no stored file.
+         */
+        get: operations["get_file_api_documents__document_id__file_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/documents/{document_id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Retry Document
+         * @description Process a document again (owner only), for example after a failure.
+         *
+         *     Args:
+         *         document_id: Id of the document.
+         *         user: The logged-in person.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The document with status ``queued``.
+         */
+        post: operations["retry_document_api_documents__document_id__retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** Body_upload_api_documents_upload_post */
+        Body_upload_api_documents_upload_post: {
+            /** Files */
+            files: string[];
+        };
+        /**
+         * DocumentOut
+         * @description A document as shown in the library.
+         */
+        DocumentOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /** Kind */
+            kind: string;
+            /** Filename */
+            filename: string | null;
+            /** Size Bytes */
+            size_bytes: number | null;
+            /** Url */
+            url: string | null;
+            /** Language */
+            language: string | null;
+            /** Page Count */
+            page_count: number | null;
+            /** Word Count */
+            word_count: number | null;
+            /** Status */
+            status: string;
+            /** Error */
+            error: string | null;
+            /** Shared */
+            shared: boolean;
+            /** Mine */
+            mine: boolean;
+            /** Owner Name */
+            owner_name: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /**
+         * DocumentPatch
+         * @description Body of ``PATCH /documents/{id}``; only given fields change.
+         */
+        DocumentPatch: {
+            /** Title */
+            title?: string | null;
+            /** Shared */
+            shared?: boolean | null;
+        };
+        /**
+         * DocumentTextOut
+         * @description Extracted text of a document.
+         */
+        DocumentTextOut: {
+            /** Markdown */
+            markdown: string;
+            /** Extractor */
+            extractor: string;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -216,6 +516,22 @@ export interface components {
             username: string;
             /** Password */
             password: string;
+        };
+        /**
+         * UploadResult
+         * @description Outcome for one uploaded file.
+         */
+        UploadResult: {
+            /** Filename */
+            filename: string;
+            /**
+             * Outcome
+             * @enum {string}
+             */
+            outcome: "created" | "duplicate" | "rejected";
+            /** Message */
+            message?: string | null;
+            document?: components["schemas"]["DocumentOut"] | null;
         };
         /**
          * UserCreate
@@ -459,6 +775,280 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_api_documents_upload_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_api_documents_upload_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadResult"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_documents_api_documents_get: {
+        parameters: {
+            query?: {
+                q?: string;
+                status?: string;
+                scope?: "all" | "mine" | "shared";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    events_api_documents_events_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    get_document_api_documents__document_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_document_api_documents__document_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    patch_document_api_documents__document_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_text_api_documents__document_id__text_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentTextOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_file_api_documents__document_id__file_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retry_document_api_documents__document_id__retry_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentOut"];
                 };
             };
             /** @description Validation Error */

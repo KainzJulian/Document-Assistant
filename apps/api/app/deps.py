@@ -100,3 +100,6 @@ def require_admin(user: Annotated[User, Depends(current_user)]) -> User:
     if user.role != "admin":
         raise ApiError(403, "forbidden", "Dafür fehlt die Berechtigung.")
     return user
+
+
+CurrentUser = Annotated[User, Depends(current_user)]

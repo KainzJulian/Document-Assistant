@@ -1,12 +1,29 @@
 """FastAPI application entry point."""
 
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+
 from fastapi import APIRouter, Depends, FastAPI
 
 from app.deps import require_csrf_header
 from app.errors import register_error_handlers
-from app.routers import auth, health, users
+from app.jobs.app import procrastinate_app
+from app.routers import auth, documents, health, users
 
-app = FastAPI(title="Document Assistant", docs_url="/api/docs", openapi_url="/api/openapi.json")
+
+@asynccontextmanager
+async def lifespan(_: FastAPI) -> AsyncGenerator[None]:
+    """Keep a connection pool to the job queue open while the api runs."""
+    async with procrastinate_app.open_async():
+        yield
+
+
+app = FastAPI(
+    title="Document Assistant",
+    docs_url="/api/docs",
+    openapi_url="/api/openapi.json",
+    lifespan=lifespan,
+)
 register_error_handlers(app)
 
 # NOTE: Every state-changing request needs the X-Requested-With header (CSRF), on top of
@@ -15,4 +32,5 @@ api = APIRouter(prefix="/api", dependencies=[Depends(require_csrf_header)])
 api.include_router(health.router)
 api.include_router(auth.router)
 api.include_router(users.router)
+api.include_router(documents.router)
 app.include_router(api)

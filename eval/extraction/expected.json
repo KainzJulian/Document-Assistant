@@ -1,0 +1,100 @@
+[
+  {
+    "file": "bericht-de.pdf",
+    "kind": "pdf",
+    "title": "Mietvertrag Wohnung Linz",
+    "page_count": 3,
+    "words": 540
+  },
+  {
+    "file": "report-en.pdf",
+    "kind": "pdf",
+    "title": "Annual Report Energy",
+    "page_count": 5,
+    "words": 880
+  },
+  {
+    "file": "garantie.docx",
+    "kind": "docx",
+    "title": "Garantiebedingungen Geschirrspüler",
+    "page_count": null,
+    "words": 140
+  },
+  {
+    "file": "notes-en.docx",
+    "kind": "docx",
+    "title": "Meeting Notes",
+    "page_count": null,
+    "words": 90
+  },
+  {
+    "file": "kurs-de.pptx",
+    "kind": "pptx",
+    "title": "Italienisch A2",
+    "page_count": 3,
+    "words": 159
+  },
+  {
+    "file": "deck-en.pptx",
+    "kind": "pptx",
+    "title": "Energy Overview",
+    "page_count": 5,
+    "words": 265
+  },
+  {
+    "file": "artikel-de.html",
+    "kind": "html",
+    "title": "Photovoltaik im Überblick",
+    "page_count": null,
+    "words": 191
+  },
+  {
+    "file": "article-en.html",
+    "kind": "html",
+    "title": "Energy Storage Basics",
+    "page_count": null,
+    "words": 187
+  },
+  {
+    "file": "buch-de.epub",
+    "kind": "epub",
+    "title": "Das kleine Mietrecht",
+    "page_count": null,
+    "words": 274
+  },
+  {
+    "file": "book-en.epub",
+    "kind": "epub",
+    "title": "Energy Handbook",
+    "page_count": null,
+    "words": 268
+  },
+  {
+    "file": "notiz-de.txt",
+    "kind": "txt",
+    "title": "Einkaufsliste und Notizen",
+    "page_count": null,
+    "words": 92
+  },
+  {
+    "file": "log-en.txt",
+    "kind": "txt",
+    "title": "Weekly log",
+    "page_count": null,
+    "words": 46
+  },
+  {
+    "file": "readme-de.md",
+    "kind": "md",
+    "title": "Projektnotizen",
+    "page_count": null,
+    "words": 96
+  },
+  {
+    "file": "guide-en.md",
+    "kind": "md",
+    "title": "User Guide",
+    "page_count": null,
+    "words": 90
+  }
+]
