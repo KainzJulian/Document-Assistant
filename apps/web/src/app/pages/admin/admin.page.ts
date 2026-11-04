@@ -117,6 +117,10 @@ export class AdminPage {
   protected async create(event: Event): Promise<void> {
     event.preventDefault();
     this.createError.set('');
+    if (this.newPassword().length < 8) {
+      this.createError.set(de.admin.passwordTooShort);
+      return;
+    }
     this.creating.set(true);
     const body: UserCreate = {
       username: this.newUsername().trim(),
@@ -159,6 +163,10 @@ export class AdminPage {
     const user = this.resetUser();
     if (!user) return;
     this.resetError.set('');
+    if (this.resetValue().length < 8) {
+      this.resetError.set(de.admin.passwordTooShort);
+      return;
+    }
     this.resetting.set(true);
     try {
       const body: UserPatch = { password: this.resetValue() };

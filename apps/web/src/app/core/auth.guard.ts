@@ -2,14 +2,18 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { SessionStore } from '../state/session.store';
 
+// NOTE: Dependencies are injected before the first await: inject() only works while Angular
+// is still synchronously running the guard.
+
 /**
  * Lets logged-in users through; everyone else goes to the login page.
  * @returns True, or a redirect to `/login`.
  */
 export const authGuard: CanActivateFn = async () => {
   const session = inject(SessionStore);
+  const router = inject(Router);
   await session.ensureLoaded();
-  return session.user() ? true : inject(Router).createUrlTree(['/login']);
+  return session.user() ? true : router.createUrlTree(['/login']);
 };
 
 /**
@@ -18,8 +22,9 @@ export const authGuard: CanActivateFn = async () => {
  */
 export const adminGuard: CanActivateFn = async () => {
   const session = inject(SessionStore);
+  const router = inject(Router);
   await session.ensureLoaded();
-  return session.user()?.role === 'admin' ? true : inject(Router).createUrlTree(['/']);
+  return session.user()?.role === 'admin' ? true : router.createUrlTree(['/']);
 };
 
 /**
@@ -28,6 +33,7 @@ export const adminGuard: CanActivateFn = async () => {
  */
 export const guestGuard: CanActivateFn = async () => {
   const session = inject(SessionStore);
+  const router = inject(Router);
   await session.ensureLoaded();
-  return session.user() ? inject(Router).createUrlTree(['/']) : true;
+  return session.user() ? router.createUrlTree(['/']) : true;
 };

@@ -38,6 +38,7 @@ export const de = {
     displayName: 'Anzeigename',
     password: 'Passwort',
     passwordHint: 'Mindestens 8 Zeichen.',
+    passwordTooShort: 'Das Passwort ist zu kurz. Es braucht mindestens 8 Zeichen.',
     isAdmin: 'Administrator',
     create: 'Benutzer anlegen',
     created: 'Benutzer angelegt.',
