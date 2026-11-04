@@ -18,11 +18,21 @@ from app.db.session import get_engine
 from app.deps import CurrentUser, DbSession
 from app.errors import ApiError
 from app.jobs.extract import extract_document
-from app.models.documents import DocumentOut, DocumentPatch, DocumentTextOut, UploadResult, to_out
+from app.models.documents import (
+    DocumentOut,
+    DocumentPatch,
+    DocumentTextOut,
+    TextImport,
+    UploadResult,
+    UrlImport,
+    to_out,
+)
 from app.repositories import documents as repo
 from app.repositories.documents import Scope
+from app.services.extractors import ExtractionError, extract_html_string, word_count
 from app.services.filetypes import KINDS, MAX_UPLOAD_BYTES, detect_kind
 from app.services.storage import delete_document_files, document_dir, safe_filename, save_file
+from app.services.urlimport import MIN_WORDS, fetch_html, normalize_url
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -101,6 +111,148 @@ async def upload(files: list[UploadFile], user: CurrentUser, db: DbSession) -> l
             if result.outcome == "created" and result.document is not None:
                 await extract_document.defer_async(document_id=str(result.document.id))
     return results
+
+
+def _duplicate(doc: Document, user: User, filename: str) -> UploadResult:
+    """Build the "already in your library" result."""
+    return UploadResult(
+        filename=filename,
+        outcome="duplicate",
+        message="Bereits in deiner Bibliothek",
+        document=to_out(doc, user.display_name, user.id),
+    )
+
+
+def _store_import(
+    db: Session,
+    user: User,
+    *,
+    source_type: str,
+    title: str,
+    data: bytes,
+    stored_name: str,
+    url: str | None = None,
+    content_hash: str | None = None,
+) -> Document:
+    """Create a document for an imported page or pasted text and commit before queueing."""
+    document_id = uuid.uuid4()
+    doc = Document(
+        id=document_id,
+        owner_id=user.id,
+        title=title[:300],
+        source_type=source_type,
+        mime="text/html" if source_type == "url" else "text/plain",
+        size_bytes=len(data),
+        url=url,
+        url_normalized=url,
+        content_hash=content_hash,
+    )
+    db.add(doc)
+    db.flush()
+    save_file(user.id, document_id, stored_name, data)
+    db.commit()
+    db.refresh(doc)
+    return doc
+
+
+def _precheck_page(html: str) -> str | None:
+    """Extract a fetched page once to see whether it has enough text.
+
+    Args:
+        html: The page HTML.
+
+    Returns:
+        The page title, if it has one.
+
+    Raises:
+        ApiError: 422 ``url_too_short`` if there is too little text.
+    """
+    try:
+        result = extract_html_string(html)
+    except ExtractionError:
+        result = None
+    if result is None or word_count(result.markdown) < MIN_WORDS:
+        raise ApiError(
+            422,
+            "url_too_short",
+            "Auf dieser Seite wurde nicht genug Text gefunden. Vielleicht braucht sie JavaScript "
+            "oder eine Anmeldung. Du kannst den Text stattdessen einfügen.",
+        )
+    return result.title
+
+
+@router.post("/url", status_code=201)
+async def import_url(body: UrlImport, user: CurrentUser, db: DbSession) -> UploadResult:
+    """Import a web page: its main text becomes a document, the raw HTML is kept.
+
+    Args:
+        body: The address.
+        user: The logged-in person.
+        db: Database session.
+
+    Returns:
+        The new document, or the existing one if the page was imported before.
+
+    Raises:
+        ApiError: 422 with a ``url_*`` code and a German message if the page cannot be used;
+            the frontend then offers to paste the text.
+    """
+    url = normalize_url(body.url)
+    existing = await run_in_threadpool(repo.find_by_url, db, user, url)
+    if existing is not None:
+        return _duplicate(existing, user, url)
+    html = await run_in_threadpool(fetch_html, url)
+    title = await run_in_threadpool(_precheck_page, html)
+    host = url.split("/")[2]
+    doc = await run_in_threadpool(
+        lambda: _store_import(
+            db,
+            user,
+            source_type="url",
+            title=title or host,
+            data=html.encode(),
+            stored_name="raw.html",
+            url=url,
+        )
+    )
+    await extract_document.defer_async(document_id=str(doc.id))
+    return UploadResult(
+        filename=url, outcome="created", document=to_out(doc, user.display_name, user.id)
+    )
+
+
+@router.post("/text", status_code=201)
+async def import_text(body: TextImport, user: CurrentUser, db: DbSession) -> UploadResult:
+    """Store pasted text as a document.
+
+    Args:
+        body: Title and text.
+        user: The logged-in person.
+        db: Database session.
+
+    Returns:
+        The new document, or the existing one if the same text was stored before.
+    """
+    data = body.text.encode()
+    content_hash = hashlib.sha256(data).hexdigest()
+    existing = await run_in_threadpool(repo.find_by_hash, db, user, content_hash)
+    if existing is not None:
+        return _duplicate(existing, user, body.title)
+    doc = await run_in_threadpool(
+        lambda: _store_import(
+            db,
+            user,
+            source_type="text",
+            title=body.title.strip(),
+            data=data,
+            stored_name="text.txt",
+            content_hash=content_hash,
+        )
+    )
+    await extract_document.defer_async(document_id=str(doc.id))
+    return UploadResult(
+        filename=body.title, outcome="created", document=to_out(doc, user.display_name, user.id)
+    )
 
 
 @router.get("")

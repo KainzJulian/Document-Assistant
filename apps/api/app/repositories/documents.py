@@ -100,3 +100,12 @@ def find_by_hash(db: Session, user: User, content_hash: str) -> Document | None:
     return db.scalar(
         select(Document).where(Document.owner_id == user.id, Document.content_hash == content_hash)
     )
+
+
+def find_by_url(db: Session, user: User, url_normalized: str) -> Document | None:
+    """Find an already imported page in the person's own library."""
+    return db.scalar(
+        select(Document).where(
+            Document.owner_id == user.id, Document.url_normalized == url_normalized
+        )
+    )

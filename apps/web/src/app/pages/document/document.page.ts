@@ -35,6 +35,7 @@ import { DialogComponent } from '../../ui/organisms/dialog/dialog.component';
           }
         </div>
 
+        @if (d.url) { <a class="mt-1 block truncate text-sm text-primary underline" [href]="d.url" target="_blank" rel="noopener noreferrer">{{ d.url }}</a> }
         <div class="mt-3 flex flex-wrap items-center gap-3">
           <app-status [status]="d.status" />
           @if (d.shared) { <app-badge>{{ d.mine ? t.library.shared : t.library.sharedBy + ' ' + d.owner_name }}</app-badge> }

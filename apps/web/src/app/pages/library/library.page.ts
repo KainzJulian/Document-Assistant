@@ -10,6 +10,7 @@ import { InputComponent } from '../../ui/atoms/input/input.component';
 import { StatusComponent } from '../../ui/atoms/status/status.component';
 import { DropZoneComponent } from '../../ui/molecules/drop-zone/drop-zone.component';
 import { EmptyStateComponent } from '../../ui/molecules/empty-state/empty-state.component';
+import { ImportDialogComponent, PastedText } from '../../ui/organisms/import-dialog/import-dialog.component';
 
 const SELECT =
   'min-h-10 rounded-control border border-border-strong bg-surface px-3 text-sm text-foreground pointer-coarse:min-h-11';
@@ -18,13 +19,16 @@ const SELECT =
 @Component({
   selector: 'app-library-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, ButtonComponent, InputComponent, StatusComponent, DropZoneComponent, EmptyStateComponent],
+  imports: [RouterLink, ButtonComponent, InputComponent, StatusComponent, DropZoneComponent, EmptyStateComponent, ImportDialogComponent],
   template: `
     <app-drop-zone #zone (filesSelected)="store.upload($event)">
       <div class="mx-auto w-full max-w-3xl px-5 py-10">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <h1 class="text-3xl font-semibold tracking-tight">{{ t.library.title }}</h1>
-          <app-button variant="primary" (click)="zone.pick()">{{ t.library.upload }}</app-button>
+          <span class="flex gap-2">
+            <app-button (click)="openImport()">{{ t.importDialog.openUrl }}</app-button>
+            <app-button variant="primary" (click)="zone.pick()">{{ t.library.upload }}</app-button>
+          </span>
         </div>
         <p class="mt-2 text-sm text-muted">{{ t.library.hint }}</p>
 
@@ -94,6 +98,17 @@ const SELECT =
         </div>
       </div>
     </app-drop-zone>
+
+    <app-import-dialog
+      #importer
+      [(open)]="importOpen"
+      [(mode)]="importMode"
+      [busy]="importBusy()"
+      [error]="importError()"
+      [offerText]="offerText()"
+      (importUrl)="importUrl($event, importer)"
+      (importText)="importText($event)"
+    />
   `,
 })
 export class LibraryPage implements OnDestroy {
@@ -106,6 +121,11 @@ export class LibraryPage implements OnDestroy {
   protected readonly statuses = ['queued', 'reading', 'indexing', 'ready', 'failed'] as const;
   protected readonly kinds = ['pdf', 'docx', 'pptx', 'html', 'epub', 'md', 'txt', 'url', 'text'] as const;
   protected readonly query = signal('');
+  protected readonly importOpen = signal(false);
+  protected readonly importMode = signal<'url' | 'text'>('url');
+  protected readonly importBusy = signal(false);
+  protected readonly importError = signal('');
+  protected readonly offerText = signal(false);
 
   constructor() {
     void this.store.load();
@@ -116,6 +136,58 @@ export class LibraryPage implements OnDestroy {
   ngOnDestroy(): void {
     clearTimeout(this.timer);
     this.store.disconnect();
+  }
+
+  /** Open the import dialog with a clean state. */
+  protected openImport(): void {
+    this.importMode.set('url');
+    this.importError.set('');
+    this.offerText.set(false);
+    this.importOpen.set(true);
+  }
+
+  /**
+   * Import a web page; if it cannot be read, show why and offer to paste the text.
+   * @param url - The address.
+   * @param dialog - The dialog, to suggest a title for pasted text.
+   */
+  protected async importUrl(url: string, dialog: ImportDialogComponent): Promise<void> {
+    this.importBusy.set(true);
+    this.importError.set('');
+    try {
+      const result = await this.store.importUrl(url);
+      this.importOpen.set(false);
+      this.toast.show(result.outcome === 'duplicate' ? de.importDialog.duplicate : de.importDialog.added);
+    } catch (e) {
+      const known = e instanceof ApiRequestError;
+      this.importError.set(known ? e.message : de.errors.unknown);
+      this.offerText.set(known && e.code.startsWith('url_') && e.code !== 'url_invalid');
+      try {
+        dialog.suggestTitle(new URL(url).hostname);
+      } catch {
+        // INFO: Not a valid address; the person types the title themselves.
+      }
+    } finally {
+      this.importBusy.set(false);
+    }
+  }
+
+  /**
+   * Store pasted text as a document.
+   * @param pasted - Title and text.
+   */
+  protected async importText(pasted: PastedText): Promise<void> {
+    this.importBusy.set(true);
+    this.importError.set('');
+    try {
+      const result = await this.store.importText(pasted.title, pasted.text);
+      this.importOpen.set(false);
+      this.toast.show(result.outcome === 'duplicate' ? de.importDialog.duplicate : de.importDialog.added);
+    } catch (e) {
+      this.importError.set(e instanceof ApiRequestError ? e.message : de.errors.unknown);
+    } finally {
+      this.importBusy.set(false);
+    }
   }
 
   /**

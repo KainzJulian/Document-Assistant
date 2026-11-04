@@ -6,6 +6,7 @@ import uuid
 from pathlib import Path
 
 from app.config import get_settings
+from app.db.models import Document
 
 _UNSAFE = re.compile(r"[^\w.\- ()\[\]äöüÄÖÜß]")
 
@@ -26,6 +27,19 @@ def safe_filename(filename: str) -> str:
 def document_dir(owner_id: uuid.UUID, document_id: uuid.UUID) -> Path:
     """Return the folder of one document's files."""
     return Path(get_settings().files_dir) / str(owner_id) / str(document_id)
+
+
+def stored_path(doc: Document) -> Path:
+    """Return where a document's source file lives.
+
+    Uploads keep their file name, imported pages are ``raw.html`` and pasted text ``text.txt``.
+    """
+    folder = document_dir(doc.owner_id, doc.id)
+    if doc.source_type == "url":
+        return folder / "raw.html"
+    if doc.source_type == "text":
+        return folder / "text.txt"
+    return folder / safe_filename(doc.filename or "")
 
 
 def save_file(owner_id: uuid.UUID, document_id: uuid.UUID, filename: str, data: bytes) -> Path:

@@ -85,3 +85,20 @@ class DocumentTextOut(BaseModel):
 
     markdown: str
     extractor: str
+
+
+class UrlImport(BaseModel):
+    """Body of ``POST /documents/url``."""
+
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    url: str = Field(min_length=1, max_length=2000)
+
+
+class TextImport(BaseModel):
+    """Body of ``POST /documents/text``."""
+
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    title: str = Field(min_length=1, max_length=300)
+    text: str = Field(min_length=1, max_length=2_000_000)

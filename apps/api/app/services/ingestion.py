@@ -11,7 +11,7 @@ from app.db.models import Document, DocumentText
 from app.db.session import get_engine
 from app.services.extractors import ExtractionError, detect_language, extract, word_count
 from app.services.filetypes import kind_for_mime
-from app.services.storage import document_dir, safe_filename
+from app.services.storage import stored_path
 
 log = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ def run_extraction(document_id: uuid.UUID) -> None:
         _set_status(db, doc, "reading")
         try:
             kind = kind_for_mime(doc.mime, doc.source_type)
-            path = document_dir(doc.owner_id, doc.id) / safe_filename(doc.filename or "")
+            path = stored_path(doc)
             result = extract(kind, path)
             existing = db.get(DocumentText, doc.id)
             if existing is None:

@@ -209,13 +209,12 @@ def extract_epub(path: Path) -> ExtractionResult:
     return ExtractionResult(markdown, "ebooklib", title or _first_heading(markdown))
 
 
-def extract_html(path: Path) -> ExtractionResult:
-    """Extract the main text of an HTML file (menus and banners dropped).
+def extract_html_string(html: str) -> ExtractionResult:
+    """Extract the main text of an HTML page (menus, banners and comments dropped).
 
     Raises:
         ExtractionError: If no main text is found.
     """
-    html = _decode(path.read_bytes())
     markdown = trafilatura.extract(
         html, output_format="markdown", include_tables=True, include_links=False
     )
@@ -225,6 +224,11 @@ def extract_html(path: Path) -> ExtractionResult:
     return ExtractionResult(
         markdown, "trafilatura", (meta.title if meta else None) or _first_heading(markdown)
     )
+
+
+def extract_html(path: Path) -> ExtractionResult:
+    """Extract the main text of an HTML file."""
+    return extract_html_string(_decode(path.read_bytes()))
 
 
 def extract_text(path: Path) -> ExtractionResult:
@@ -240,6 +244,8 @@ EXTRACTORS = {
     "pptx": extract_pptx,
     "epub": extract_epub,
     "html": extract_html,
+    "url": extract_html,
+    "text": extract_text,
     "txt": extract_text,
     "md": extract_text,
 }

@@ -130,6 +130,30 @@ export class LibraryStore {
   }
 
   /**
+   * Import a web page.
+   * @param url - The address.
+   * @returns The API's result (created or duplicate).
+   * @throws {ApiRequestError} With a `url_*` code and a German message if the page cannot be used.
+   */
+  async importUrl(url: string): Promise<UploadResult> {
+    const result = await this.api.post<UploadResult>('/documents/url', { url });
+    if (result.document) this.upsert(result.document);
+    return result;
+  }
+
+  /**
+   * Store pasted text as a document.
+   * @param title - Title of the document.
+   * @param text - The text.
+   * @returns The API's result (created or duplicate).
+   */
+  async importText(title: string, text: string): Promise<UploadResult> {
+    const result = await this.api.post<UploadResult>('/documents/text', { title, text });
+    if (result.document) this.upsert(result.document);
+    return result;
+  }
+
+  /**
    * Hide a finished upload entry.
    * @param id - Id of the entry.
    */
