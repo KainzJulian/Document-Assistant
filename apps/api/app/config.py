@@ -17,6 +17,8 @@ class Settings(BaseSettings):
         hardware_json: GPU facts written by ``infra/scripts/detect-gpu.sh`` (mounted read-only).
         memory_bandwidth_gb_s: Memory bandwidth used for the CPU speed estimate.
         ollama_context: Context size Ollama models are assumed to run with.
+        fake_providers: Use the deterministic fake provider everywhere (tests, trying the app without keys).
+        allow_private_urls: Let the URL import reach private addresses (only for end-to-end tests).
     """
 
     database_url: str
@@ -27,6 +29,8 @@ class Settings(BaseSettings):
     hardware_json: str = "/data/hardware/hardware.json"
     memory_bandwidth_gb_s: float = 20.0
     ollama_context: int = 8192
+    fake_providers: bool = False
+    allow_private_urls: bool = False
 
     @property
     def conninfo(self) -> str:

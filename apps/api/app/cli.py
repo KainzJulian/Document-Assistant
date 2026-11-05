@@ -43,10 +43,16 @@ def create_admin(username: str, display_name: str, password: str) -> None:
 def main() -> None:
     """Parse arguments and run the chosen command."""
     parser = argparse.ArgumentParser(prog="app.cli")
-    parser.add_subparsers(dest="command", required=True).add_parser(
-        "create-admin", help="Create the first admin account (prompts for values)."
+    sub = parser.add_subparsers(dest="command", required=True).add_parser(
+        "create-admin", help="Create an admin account (prompts unless --username and --password are given)."
     )
-    parser.parse_args()
+    sub.add_argument("--username")
+    sub.add_argument("--display-name")
+    sub.add_argument("--password")
+    args = parser.parse_args()
+    if args.username and args.password:
+        create_admin(args.username, args.display_name or args.username, args.password)
+        return
     username = input("Benutzername: ").strip()
     display_name = input(f"Anzeigename [{username}]: ").strip() or username
     password = getpass.getpass("Passwort: ")

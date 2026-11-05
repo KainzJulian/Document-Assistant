@@ -11,14 +11,17 @@ from app.deps import CurrentUser, DbSession
 from app.errors import ApiError
 from app.models.ai import BenchmarkIn, BenchmarkOut, GpuOut, OllamaFitOut
 from app.providers.base import Message, ProviderError
+from app.providers.fake import FakeProvider
 from app.providers.ollama_provider import OllamaProvider
 from app.services.hardware import SEVERITY, estimate_words_per_s, need_gb, read_hardware, verdict_for
 
 router = APIRouter(prefix="/hardware", tags=["hardware"])
 
 
-def _ollama(db: DbSession) -> OllamaProvider:
+def _ollama(db: DbSession) -> OllamaProvider | FakeProvider:
     """Return the adapter for the first enabled Ollama provider (or the default address)."""
+    if get_settings().fake_providers:
+        return FakeProvider()
     row = db.scalar(select(Provider).where(Provider.kind == "ollama", Provider.enabled.is_(True)).order_by(Provider.id))
     return OllamaProvider((row.base_url if row else None) or get_settings().ollama_url)
 

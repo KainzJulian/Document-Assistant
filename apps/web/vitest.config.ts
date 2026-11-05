@@ -10,6 +10,13 @@ const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(file
 export default defineConfig({
   test: {
     projects: [{
+      // Pure TypeScript (domain helpers, SSE client): fast, no browser.
+      test: {
+        name: 'unit',
+        include: ['src/**/*.spec.ts'],
+        environment: 'node'
+      }
+    }, {
       extends: true,
       plugins: [// Forwards Angular build options (styles, assets, zoneless, …) into standalone vitest runs
       storybookAngularVitest({}),

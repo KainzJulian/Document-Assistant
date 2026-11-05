@@ -5,6 +5,7 @@ from app.db.models import Provider
 from app.errors import ApiError
 from app.providers.anthropic_provider import AnthropicProvider
 from app.providers.base import LlmProvider
+from app.providers.fake import FakeProvider
 from app.providers.google_provider import GoogleProvider
 from app.providers.ollama_provider import OllamaProvider
 from app.providers.openai_provider import OpenAIProvider
@@ -23,6 +24,8 @@ def build_provider(row: Provider) -> LlmProvider:
     Raises:
         ApiError: If the provider needs a key and none is stored.
     """
+    if get_settings().fake_providers:
+        return FakeProvider()
     if row.kind == "ollama":
         return OllamaProvider(row.base_url or get_settings().ollama_url)
     if not row.api_key_enc:

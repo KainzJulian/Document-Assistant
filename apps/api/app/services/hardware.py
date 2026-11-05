@@ -38,15 +38,20 @@ def read_hardware() -> Hardware:
         The current hardware; a missing or broken ``hardware.json`` means "no GPU".
     """
     memory = psutil.virtual_memory()
-    gpu: dict[str, object] = {}
+    data: dict[str, object] = {}
     try:
         data = json.loads(Path(get_settings().hardware_json).read_text(encoding="utf-8"))
-        gpu = data.get("gpu") or {}
     except (OSError, ValueError):
-        gpu = {}
+        data = {}
+    gpu_raw = data.get("gpu")
+    gpu: dict[str, object] = gpu_raw if isinstance(gpu_raw, dict) else {}
+    # NOTE: hardware.json may fix the RAM numbers ("ram_total_gb", "ram_free_gb"); tests use this
+    # so verdicts are the same on every machine.
+    total = float(data.get("ram_total_gb") or memory.total / _GB)  # type: ignore[arg-type]
+    free = float(data.get("ram_free_gb") or memory.available / _GB)  # type: ignore[arg-type]
     return Hardware(
-        ram_total_gb=memory.total / _GB,
-        ram_free_gb=memory.available / _GB,
+        ram_total_gb=total,
+        ram_free_gb=free,
         gpu_name=str(gpu["name"]) if gpu.get("name") else None,
         vram_total_gb=float(gpu.get("vram_total_gb") or 0),  # type: ignore[arg-type]
         vram_free_gb=float(gpu.get("vram_free_gb") or 0),  # type: ignore[arg-type]

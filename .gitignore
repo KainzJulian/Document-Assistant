@@ -16,6 +16,13 @@ dist/
 storybook-static/
 apps/web/openapi.json
 
+# Test output
+.pytest_cache/
+.coverage
+htmlcov/
+apps/web/test-results/
+apps/web/e2e-report/
+
 # Runtime data
 backups/
 hardware.json

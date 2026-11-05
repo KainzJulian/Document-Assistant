@@ -65,6 +65,11 @@ module.exports = defineConfig([
       ],
     },
   },
+  // Tests and browser specs: describe/it blocks name the behaviour, so no JSDoc per helper.
+  {
+    files: ["**/*.spec.ts", "e2e/**/*.ts", "playwright.config.ts"],
+    rules: { "jsdoc/require-jsdoc": "off" },
+  },
   {
     files: ["**/*.html"],
     extends: [angular.configs.templateRecommended, angular.configs.templateAccessibility],

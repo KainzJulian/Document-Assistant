@@ -6,6 +6,8 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import httpx
 
+from app.config import get_settings
+
 from app.errors import ApiError
 
 MAX_PAGE_BYTES = 10 * 1024 * 1024
@@ -63,6 +65,8 @@ def _check_public(host: str) -> None:
         infos = socket.getaddrinfo(host, None)
     except socket.gaierror:
         raise _bad("Diese Adresse wurde nicht gefunden.", "url_not_found") from None
+    if get_settings().allow_private_urls:
+        return
     for info in infos:
         ip = ipaddress.ip_address(info[4][0])
         if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast:

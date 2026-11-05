@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/angular-vite';
+import { expect, within } from 'storybook/test';
 import { OllamaFit } from '../../../core/api';
 import { OllamaFitDialogComponent } from './ollama-fit-dialog.component';
 
@@ -24,7 +25,16 @@ export default meta;
 type Story = StoryObj<OllamaFitDialogComponent>;
 
 /** No GPU: the model runs on the CPU. */
-export const CpuOnly: Story = {};
+export const CpuOnly: Story = {
+  play: async ({ canvasElement }) => {
+    const dialog = within(canvasElement).getByRole('dialog');
+    await expect(dialog).toHaveTextContent('Keine GPU');
+    await expect(dialog).toHaveTextContent('16 GB gesamt, 11.2 GB frei');
+    await expect(dialog).toHaveTextContent('geschätzt ca. 3.2 Wörter pro Sekunde');
+    await expect(within(dialog).getByRole('button', { name: 'Trotzdem verwenden' })).toBeVisible();
+    await expect(within(dialog).getByRole('button', { name: 'Abbrechen' })).toBeVisible();
+  },
+};
 /** Part of the model runs on a GPU. */
 export const PartialGpu: Story = {
   args: { fit: { ...base, verdict: 'partial', gpu: { name: 'GeForce RTX 3060', vram_total_gb: 6, vram_free_gb: 4.5 }, est_words_per_s: 9 } },

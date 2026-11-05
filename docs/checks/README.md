@@ -29,4 +29,17 @@ Scripts for the Check step of each plan task. They talk to a running stack (`mak
 | W1 extraction samples | `cd apps/api && uv run python ../../eval/extraction/run.py` | none |
 | W2 URL sample set | `docker exec -i doc-assistant-api-1 python - < eval/urls/run.py` | stack with internet |
 
+## Automated tests (W10)
+
+These replace the hand scripts above for repeat runs. Nothing in W3 to W10 has been run yet; run them in this order and record the results in `docs/test-log.md`.
+
+| Command | What it runs | Needs |
+| --- | --- | --- |
+| `make test-api` | pytest in `apps/api/tests` against a throwaway Postgres (port 55432) with the fake model; fails below 85 percent coverage | Docker |
+| `make test-web` | Vitest: `unit` project (domain helpers, SSE client) and the Storybook component and interaction tests | `npx playwright install chromium` once |
+| `make test-e2e` | Playwright: one spec per acceptance criterion against a throwaway stack (fake model, fake hardware, local web pages) on port 8090 | Docker, `npx playwright install chromium` once |
+| `make test` | `test-api` and `test-web` | as above |
+
+`make test-down` removes the test database. The e2e stack removes itself when the run ends. `docs/acceptance.md` maps every criterion to its test.
+
 Later waves add their scripts here (see the table in each wave's section of `docs/test-log.md`).

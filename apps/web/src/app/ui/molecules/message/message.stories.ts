@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/angular-vite';
+import { expect, within } from 'storybook/test';
 import { MessageComponent } from './message.component';
 
 const citations = [
@@ -23,6 +24,17 @@ export const Answer: Story = {
     citations,
     canRegenerate: true,
     content: 'Du kannst mit **drei Monaten** Frist kündigen [1].\n\nAusnahmen:\n- Verkauf der Wohnung nur mit Zustimmung [2]\n- *wichtige Gründe*',
+  },
+};
+/** Known citation numbers become source buttons; an unknown number stays plain text. */
+export const CitationChips: Story = {
+  args: { citations, content: 'Frist von drei Monaten [1] und Zustimmung [2], aber nichts zu [7].' },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('button', { name: 'Quelle 1' })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: 'Quelle 2' })).toBeVisible();
+    await expect(canvas.queryByRole('button', { name: 'Quelle 7' })).toBeNull();
+    await expect(canvas.getByText('[7]')).toBeVisible();
   },
 };
 /** Waiting for the first token. */

@@ -1,4 +1,4 @@
-.PHONY: docs docs-api docs-web ollama-pull hw-refresh check check-api check-web gen-api create-admin backup restore update up down
+.PHONY: docs docs-api docs-web ollama-pull hw-refresh check check-api check-web gen-api create-admin backup restore update up down test test-db test-down test-api test-web test-e2e
 
 COMPOSE = docker compose -f infra/docker-compose.yml --env-file infra/.env
 
@@ -10,6 +10,33 @@ check-api:
 
 check-web:
 	cd apps/web && npm run lint && npm run typecheck && npm run build-storybook
+
+# Automated tests (W10). Backend and e2e use the fake provider: no keys, no network, no Ollama.
+test: test-api test-web
+
+# Disposable Postgres on port 55432 for the backend tests.
+test-db:
+	docker compose -f infra/docker-compose.test.yml up -d --wait
+
+test-down:
+	docker compose -f infra/docker-compose.test.yml down
+
+test-api: test-db
+	cd apps/api && uv run pytest
+
+# Unit tests of the pure frontend code plus the Storybook component and interaction tests.
+test-web:
+	cd apps/web && npm test
+
+# Browser tests of the 20 acceptance criteria against a throwaway stack (see docs/acceptance.md).
+# Builds the stack (fake model, fixed fake hardware, local web pages), creates the admin, runs Playwright
+# and always removes the stack again. First run: `cd apps/web && npx playwright install chromium`.
+E2E = docker compose -f infra/docker-compose.e2e.yml
+
+test-e2e:
+	$(E2E) up -d --build --wait
+	$(E2E) exec -T api python -m app.cli create-admin --username admin --password Admin-Passw0rd-1 || true
+	cd apps/web && npx playwright test; status=$$?; cd ../.. && $(E2E) down -v; exit $$status
 
 # Regenerates the TypeScript API types from the FastAPI schema (no running server needed).
 # NOTE: run through npx because openapi-typescript 7 peers on TypeScript 5, Angular 22 needs 6.
