@@ -1,0 +1,46 @@
+# Summary test set (W8). The four synthetic documents below come from make_synthetic.py; add your
+# own so the set has 10 documents: German and English, 2 to 200 pages, article, report, slides,
+# e-book chapter. Each document needs 5 to 12 hand-written key points: the facts a good Medium or
+# longer summary must contain.
+#
+# file:       path relative to eval/summaries/docs/
+# key_points: short statements; the judge checks whether the summary covers each one
+
+- file: artikel-stadtwerke.docx
+  key_points:
+    - 41 Megawatt neue Photovoltaik-Leistung im Jahr 2025
+    - Größter Standort ist die Anlage im Hafen mit 12 Megawatt
+    - Haushaltsstrompreis sinkt zum 1. Jänner 2026 um 6 Prozent
+    - Fernwärme-Grundpreis steigt um 3 Prozent
+    - Bis 2030 sollen 70 Prozent des Stroms erneuerbar sein
+    - Batteriespeicher mit 20 Megawattstunden im Sommer 2026
+    - Investitionen von rund 185 Millionen Euro
+
+- file: report-annual.pdf
+  key_points:
+    - Umsatz wuchs um 14 Prozent auf 320 Millionen Euro
+    - Wind trug 40 Prozent zum Umsatz bei
+    - Operative Marge stieg von 9 auf 12 Prozent
+    - 210 neue Ingenieure eingestellt, vor allem im Speicherbereich
+    - Neues Werk in Graz startet im März 2026
+    - Dividende von 1,20 Euro je Aktie vorgeschlagen
+    - Risiken sind Lieferverzug bei Transformatoren und steigende Zinsen
+    - Ausblick 2026 - Umsatzwachstum von 8 bis 10 Prozent
+
+- file: folien-alpenblick.pptx
+  key_points:
+    - Projekt Alpenblick startet im April 2026 und dauert 18 Monate
+    - Budget 2,4 Millionen Euro, davon 40 Prozent Fördermittel
+    - Team aus 9 Personen an drei Standorten
+    - Prototyp als Meilenstein 1 im Juli 2026
+    - Hauptrisiko ist die Sensor-Verfügbarkeit mit 14 Wochen Lieferzeit
+    - Kundenabnahme im Oktober 2027
+
+- file: chapter-tern.epub
+  key_points:
+    - Captain Marsh erreicht am 3. Mai die Insel Tern
+    - Der Leuchtturmwärter ist seit zwei Wochen verschwunden
+    - Das Logbuch zeigt, dass die Lampe bis zum 11. April jede Nacht brannte
+    - Marsh findet einen versiegelten Brief an seine Schwester
+    - Der Dorfarzt behauptet, der Wärter sei per Boot gegangen, aber das Boot liegt noch im Hafen
+    - Marsh beschließt zu bleiben, bis das Versorgungsschiff zurückkehrt
