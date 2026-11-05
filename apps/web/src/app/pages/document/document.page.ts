@@ -10,13 +10,14 @@ import { ButtonComponent } from '../../ui/atoms/button/button.component';
 import { InputComponent } from '../../ui/atoms/input/input.component';
 import { StatusComponent } from '../../ui/atoms/status/status.component';
 import { EmptyStateComponent } from '../../ui/molecules/empty-state/empty-state.component';
+import { SummarySection } from './summary-section';
 import { DialogComponent } from '../../ui/organisms/dialog/dialog.component';
 
 /** One document: details, rename, share, download, delete, retry and the extracted text. */
 @Component({
   selector: 'app-document-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, ButtonComponent, InputComponent, BadgeComponent, StatusComponent, EmptyStateComponent, DialogComponent],
+  imports: [RouterLink, ButtonComponent, InputComponent, BadgeComponent, StatusComponent, EmptyStateComponent, DialogComponent, SummarySection],
   template: `
     <div class="mx-auto w-full max-w-3xl px-5 py-10">
       <a routerLink="/library" class="text-sm text-muted hover:text-foreground">← {{ t.document.back }}</a>
@@ -68,10 +69,7 @@ import { DialogComponent } from '../../ui/organisms/dialog/dialog.component';
           </label>
         }
 
-        <section class="mt-10" aria-labelledby="doc-summaries">
-          <h2 id="doc-summaries" class="mb-3 text-xl font-semibold">{{ t.document.summaries }}</h2>
-          <p class="text-sm text-muted">{{ t.document.summariesSoon }}</p>
-        </section>
+        <app-summary-section [documentId]="d.id" [ready]="d.status === 'ready'" />
 
         <section class="mt-10" aria-labelledby="doc-text">
           <h2 id="doc-text" class="mb-3 text-xl font-semibold">{{ t.document.text }}</h2>

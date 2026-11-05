@@ -82,6 +82,7 @@ const SELECT =
                     @if (d.error) { <p class="text-sm text-danger">{{ d.error }}</p> }
                   </div>
                   <app-status [status]="d.status" />
+                  @if (d.status === 'ready') { <a class="text-sm text-primary underline" [routerLink]="['/library', d.id]" fragment="doc-summaries">{{ t.summary.create }}</a> }
                   @if (d.status === 'failed' && d.mine) { <app-button variant="quiet" size="sm" (click)="retry(d)">{{ t.library.retry }}</app-button> }
                 </li>
               }
