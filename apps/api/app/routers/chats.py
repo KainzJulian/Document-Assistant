@@ -233,7 +233,10 @@ async def send_message(chat_id: uuid.UUID, body: SendMessage, user: CurrentUser,
     Returns:
         An event stream.
     """
-    ctx = await run_in_threadpool(_prepare, db, user, chat_id, body.content.strip(), None)
+    content = body.content.strip()
+    if not content:
+        raise ApiError(422, "empty_question", "Bitte gib eine Frage ein.")
+    ctx = await run_in_threadpool(_prepare, db, user, chat_id, content, None)
     return _stream(ctx)
 
 

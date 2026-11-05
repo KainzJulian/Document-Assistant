@@ -1,4 +1,4 @@
-.PHONY: ollama-pull hw-refresh check check-api check-web gen-api create-admin backup restore update up down
+.PHONY: docs docs-api docs-web ollama-pull hw-refresh check check-api check-web gen-api create-admin backup restore update up down
 
 COMPOSE = docker compose -f infra/docker-compose.yml --env-file infra/.env
 
@@ -16,6 +16,15 @@ check-web:
 gen-api:
 	cd apps/api && DATABASE_URL=postgresql+psycopg://x:x@localhost/x uv run python -c "import json; from app.main import app; json.dump(app.openapi(), open('../web/openapi.json', 'w'))"
 	cd apps/web && npx --yes openapi-typescript@7.13.0 openapi.json -o src/app/core/api-schema.ts
+
+# Generated reference docs (docs/reference/): Python with pdoc, Angular with Compodoc.
+docs: docs-api docs-web
+
+docs-api:
+	cd apps/api && DATABASE_URL=postgresql+psycopg://x:x@localhost/x uv run --with pdoc pdoc -o ../../docs/reference/api app
+
+docs-web:
+	cd apps/web && npx --yes @compodoc/compodoc -p tsconfig.app.json -d ../../docs/reference/web --disableCoverage
 
 # Pulls the default embedding model into the project's own Ollama (profile ollama must run).
 ollama-pull:

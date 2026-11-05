@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, input, output, signal, viewChild } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ChatSummary } from '../../../core/api';
 import { de } from '../../../core/i18n/de';
@@ -21,6 +21,7 @@ const NAV_LINK =
   imports: [RouterLink, RouterLinkActive, ChatListComponent],
   host: { '(document:keydown.escape)': 'closeDrawer()', class: 'block' },
   template: `
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-control focus:bg-surface focus:px-4 focus:py-2 focus:shadow-lg">{{ t.nav.skip }}</a>
     <div class="flex h-dvh bg-background text-foreground">
       @if (drawerOpen()) {
         <button type="button" tabindex="-1" class="fixed inset-0 z-30 bg-overlay lg:hidden" [attr.aria-label]="t.nav.close" (click)="closeDrawer()"></button>
@@ -33,7 +34,7 @@ const NAV_LINK =
       >
         <div class="flex items-center justify-between px-5 pt-6 pb-4">
           <span class="text-lg font-semibold">{{ t.app.name }}</span>
-          <button type="button" class="min-h-10 cursor-pointer px-2 text-sm text-muted hover:text-foreground lg:hidden" (click)="closeDrawer()">{{ t.nav.close }}</button>
+          <button #closeBtn type="button" class="min-h-10 cursor-pointer px-2 text-sm text-muted hover:text-foreground lg:hidden" (click)="closeDrawer()">{{ t.nav.close }}</button>
         </div>
 
         <div class="px-3">
@@ -43,6 +44,7 @@ const NAV_LINK =
         <nav [attr.aria-label]="t.nav.sections" class="mt-3 space-y-0.5 px-3">
           <a routerLink="/library" routerLinkActive="bg-primary-soft font-medium text-primary" [class]="navLink" (click)="closeDrawer()">{{ t.nav.library }}</a>
           <a routerLink="/settings" routerLinkActive="bg-primary-soft font-medium text-primary" [class]="navLink" (click)="closeDrawer()">{{ t.nav.settings }}</a>
+          <a routerLink="/help" routerLinkActive="bg-primary-soft font-medium text-primary" [class]="navLink" (click)="closeDrawer()">{{ t.nav.help }}</a>
           @if (isAdmin()) {
             <a routerLink="/admin" routerLinkActive="bg-primary-soft font-medium text-primary" [class]="navLink" (click)="closeDrawer()">{{ t.nav.users }}</a>
           }
@@ -72,10 +74,10 @@ const NAV_LINK =
 
       <div class="flex min-w-0 flex-1 flex-col">
         <header class="flex items-center gap-3 border-b border-border bg-surface px-4 py-2 lg:hidden">
-          <button type="button" class="min-h-10 cursor-pointer rounded-control px-2 text-sm font-medium hover:bg-surface-muted pointer-coarse:min-h-11" (click)="drawerOpen.set(true)">{{ t.nav.menu }}</button>
+          <button #menuBtn type="button" class="min-h-10 cursor-pointer rounded-control px-2 text-sm font-medium hover:bg-surface-muted pointer-coarse:min-h-11" (click)="openDrawer()">{{ t.nav.menu }}</button>
           <span class="font-semibold">{{ t.app.name }}</span>
         </header>
-        <main class="min-h-0 flex-1 overflow-y-auto"><ng-content /></main>
+        <main id="main-content" tabindex="-1" class="min-h-0 flex-1 overflow-y-auto outline-none"><ng-content /></main>
       </div>
     </div>
   `,
@@ -84,6 +86,8 @@ export class AppShellComponent {
   protected readonly t = de;
   protected readonly navLink = NAV_LINK;
   protected readonly drawerOpen = signal(false);
+  private readonly menuBtn = viewChild<ElementRef<HTMLButtonElement>>('menuBtn');
+  private readonly closeBtn = viewChild<ElementRef<HTMLButtonElement>>('closeBtn');
 
   /** Name of the logged-in person. */
   readonly userName = input.required<string>();
@@ -121,8 +125,16 @@ export class AppShellComponent {
     this.chatOpen.emit(request);
   }
 
-  /** Close the mobile drawer. */
+  /** Open the mobile drawer and move the keyboard focus into it. */
+  protected openDrawer(): void {
+    this.drawerOpen.set(true);
+    setTimeout(() => this.closeBtn()?.nativeElement.focus(), 0);
+  }
+
+  /** Close the mobile drawer and give the focus back to the menu button. */
   protected closeDrawer(): void {
+    if (!this.drawerOpen()) return;
     this.drawerOpen.set(false);
+    this.menuBtn()?.nativeElement.focus();
   }
 }

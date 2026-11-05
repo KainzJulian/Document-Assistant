@@ -11,6 +11,7 @@ from fastapi import APIRouter, Request, UploadFile
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.db.models import Document, DocumentText, User
@@ -65,10 +66,24 @@ def _store(db: Session, user: User, filename: str, data: bytes, kind: str) -> Up
         size_bytes=len(data),
         content_hash=content_hash,
     )
-    db.add(doc)
-    db.flush()
-    save_file(user.id, document_id, stored_name, data)
-    db.commit()
+    try:
+        db.add(doc)
+        db.flush()
+        save_file(user.id, document_id, stored_name, data)
+        db.commit()
+    except IntegrityError:
+        # The same file was uploaded twice at the same moment; the other request won.
+        db.rollback()
+        existing = repo.find_by_hash(db, user, content_hash)
+        if existing is None:
+            raise
+        return _duplicate(existing, user, filename)
+    except OSError:
+        db.rollback()
+        delete_document_files(user.id, document_id)
+        return UploadResult(
+            filename=filename, outcome="rejected", message="Auf dem Server ist nicht genug Speicherplatz frei."
+        )
     db.refresh(doc)
     return UploadResult(
         filename=filename, outcome="created", document=to_out(doc, user.display_name, user.id)

@@ -8,9 +8,14 @@ export type UploadResult = components['schemas']['UploadResult'];
  * Upload one file and report progress (fetch cannot report upload progress, XHR can).
  * @param file - The file to upload.
  * @param onProgress - Called with a number from 0 to 1 while bytes are sent.
+ * @param onUnauthorized - Called if the session expired during the upload (HTTP 401).
  * @returns The API's result for this file.
  */
-export function uploadFile(file: File, onProgress: (fraction: number) => void): Promise<UploadResult> {
+export function uploadFile(
+  file: File,
+  onProgress: (fraction: number) => void,
+  onUnauthorized?: () => void,
+): Promise<UploadResult> {
   return new Promise((resolve) => {
     const failed = (message: string): UploadResult => ({ filename: file.name, outcome: 'rejected', message });
     const body = new FormData();
@@ -23,6 +28,7 @@ export function uploadFile(file: File, onProgress: (fraction: number) => void): 
     };
     xhr.onerror = (): void => resolve(failed(de.errors.network));
     xhr.onload = (): void => {
+      if (xhr.status === 401) onUnauthorized?.();
       try {
         const parsed = JSON.parse(xhr.responseText) as UploadResult[] | { error?: { message?: string } };
         if (xhr.status === 200 && Array.isArray(parsed) && parsed[0]) resolve(parsed[0]);

@@ -96,6 +96,9 @@ class Document(Base):
             "status IN ('queued', 'reading', 'indexing', 'ready', 'failed')",
             name="documents_status_ck",
         ),
+        Index("documents_owner_created_ix", "owner_id", "created_at"),
+        Index("documents_shared_ix", "shared", postgresql_where=text("shared")),
+        Index("documents_title_trgm", "title", postgresql_using="gin", postgresql_ops={"title": "gin_trgm_ops"}),
         {"comment": "Library documents; owner_id scopes every query."},
     )
 
@@ -259,7 +262,10 @@ class Chat(Base):
     """A private conversation about selected documents."""
 
     __tablename__ = "chats"
-    __table_args__ = {"comment": "Chats are always private to their owner."}
+    __table_args__ = (
+        Index("chats_owner_updated_ix", "owner_id", "updated_at"),
+        {"comment": "Chats are always private to their owner."},
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, server_default=_UUID_DEFAULT)
     owner_id: Mapped[uuid.UUID] = mapped_column(
@@ -299,6 +305,7 @@ class Message(Base):
             postgresql_using="gin",
             postgresql_ops={"content": "gin_trgm_ops"},
         ),
+        Index("messages_chat_created_ix", "chat_id", "created_at"),
         {"comment": "Chat messages; tsv and trigram indexes power typo-tolerant search."},
     )
 

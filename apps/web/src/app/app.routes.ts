@@ -3,6 +3,7 @@ import { adminGuard, authGuard, guestGuard } from './core/auth.guard';
 import { de } from './core/i18n/de';
 import { AdminPage } from './pages/admin/admin.page';
 import { DocumentPage } from './pages/document/document.page';
+import { HelpPage } from './pages/help/help.page';
 import { AppLayoutPage } from './pages/layout/app-layout.page';
 import { ChatPage } from './pages/chat/chat.page';
 import { LibraryPage } from './pages/library/library.page';
@@ -23,6 +24,7 @@ export const routes: Routes = [
       { path: 'library', component: LibraryPage, title: de.nav.library },
       { path: 'library/:id', component: DocumentPage, title: de.nav.library },
       { path: 'settings', component: SettingsPage, title: de.nav.settings },
+      { path: 'help', component: HelpPage, title: de.nav.help },
       { path: 'admin', component: AdminPage, canActivate: [adminGuard], title: de.nav.users },
     ],
   },

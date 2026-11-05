@@ -122,7 +122,11 @@ export class LibraryStore {
     this.uploads.update((list) => [...entries, ...list]);
     for (const [index, file] of files.entries()) {
       const entry = entries[index];
-      const result = await uploadFile(file, (progress) => this.patchUpload(entry.id, { progress }));
+      const result = await uploadFile(
+        file,
+        (progress) => this.patchUpload(entry.id, { progress }),
+        () => this.api.onUnauthorized?.(),
+      );
       this.patchUpload(entry.id, { progress: 1, result });
       if (result.document) this.upsert(result.document);
       if (result.outcome === 'created') setTimeout(() => this.dismissUpload(entry.id), 6000);

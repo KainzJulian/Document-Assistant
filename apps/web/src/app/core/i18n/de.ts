@@ -10,6 +10,8 @@ export const de = {
     library: 'Bibliothek',
     settings: 'Einstellungen',
     users: 'Benutzer',
+    help: 'Hilfe',
+    skip: 'Zum Inhalt springen',
     menu: 'Menü',
     close: 'Schließen',
     searchChats: 'Chats durchsuchen',
@@ -78,6 +80,7 @@ export const de = {
     pages: 'Seiten',
     slides: 'Folien',
     words: 'Wörter',
+    more: 'Mehr anzeigen',
   },
   importDialog: {
     openUrl: 'URL importieren',

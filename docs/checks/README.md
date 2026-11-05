@@ -25,6 +25,7 @@ Scripts for the Check step of each plan task. They talk to a running stack (`mak
 | W6 chat search | `w6-search-api.py` (inside the api container) | stack |
 | W7 summaries | `w7-summaries-api.py` (inside the api container; rules need no model, live part needs one) | stack, model, a short and a 200-page document |
 | W8 evaluation | `eval/run_summaries.py`, `eval/run_rag.py`, guide in `docs/eval/README.md` | stack, models, judge model key |
+| W9 performance and edge cases | `w9-performance.py` (inside the api container), `w9-edge-cases.md`, `w9-manual.md` | stack |
 | W1 extraction samples | `cd apps/api && uv run python ../../eval/extraction/run.py` | none |
 | W2 URL sample set | `docker exec -i doc-assistant-api-1 python - < eval/urls/run.py` | stack with internet |
 

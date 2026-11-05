@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ApiClient, ApiRequestError, DocumentOut } from '../../core/api';
 import { de } from '../../core/i18n/de';
@@ -74,7 +74,7 @@ const SELECT =
         <div class="mt-6">
           @if (store.documents().length > 0) {
             <ul class="divide-y divide-border border-y border-border">
-              @for (d of store.documents(); track d.id) {
+              @for (d of visibleDocs(); track d.id) {
                 <li class="flex flex-wrap items-center gap-x-4 gap-y-1 py-4">
                   <div class="min-w-0 flex-1">
                     <a class="block truncate font-medium hover:underline" [routerLink]="['/library', d.id]">{{ d.title }}</a>
@@ -87,6 +87,9 @@ const SELECT =
                 </li>
               }
             </ul>
+            @if (store.documents().length > shown()) {
+              <div class="mt-4 text-center"><app-button (click)="shown.update(n => n + 200)">{{ t.library.more }} ({{ store.documents().length - shown() }})</app-button></div>
+            }
           } @else if (!store.loading()) {
             @if (hasFilter()) {
               <p class="py-8 text-center text-muted">{{ t.library.noMatch }}</p>
@@ -121,6 +124,8 @@ export class LibraryPage implements OnDestroy {
   protected readonly select = SELECT;
   protected readonly statuses = ['queued', 'reading', 'indexing', 'ready', 'failed'] as const;
   protected readonly kinds = ['pdf', 'docx', 'pptx', 'html', 'epub', 'md', 'txt', 'url', 'text'] as const;
+  protected readonly shown = signal(200);
+  protected readonly visibleDocs = computed(() => this.store.documents().slice(0, this.shown()));
   protected readonly query = signal('');
   protected readonly importOpen = signal(false);
   protected readonly importMode = signal<'url' | 'text'>('url');
