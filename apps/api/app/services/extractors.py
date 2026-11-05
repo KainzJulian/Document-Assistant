@@ -24,7 +24,7 @@ from lxml import html as lxml_html
 from pptx import Presentation
 
 PAGE_MARKER = re.compile(r"^<!--page:(\d+)-->$", re.MULTILINE)
-_STOP = {
+STOPWORDS = {
     "de": set(
         """der die das und ist nicht ein eine zu den mit von für auf im dem des sich
         auch als an es werden aus er hat dass sie nach bei einer um am sind noch wie
@@ -77,7 +77,7 @@ def detect_language(text: str) -> str | None:
     words = re.findall(r"[a-zäöüß]+", text[:40000].lower())
     if len(words) < 20:
         return None
-    scores = {lang: sum(w in stop for w in words) / len(words) for lang, stop in _STOP.items()}
+    scores = {lang: sum(w in stop for w in words) / len(words) for lang, stop in STOPWORDS.items()}
     lang, best = max(scores.items(), key=lambda item: item[1])
     other = min(scores.values())
     return lang if best >= 0.12 and best > other * 1.5 else None

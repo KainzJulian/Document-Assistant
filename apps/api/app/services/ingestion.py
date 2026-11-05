@@ -16,7 +16,7 @@ from app.services.storage import stored_path
 log = logging.getLogger(__name__)
 
 
-def _set_status(db: Session, doc: Document, status: str, error: str | None = None) -> None:
+def set_status(db: Session, doc: Document, status: str, error: str | None = None) -> None:
     """Save a status change; the library watches ``updated_at``."""
     doc.status = status
     doc.error = error
@@ -24,18 +24,21 @@ def _set_status(db: Session, doc: Document, status: str, error: str | None = Non
     db.commit()
 
 
-def run_extraction(document_id: uuid.UUID) -> None:
-    """Read a stored file, save its Markdown and set the document to ``ready`` or ``failed``.
+def run_extraction(document_id: uuid.UUID) -> bool:
+    """Read a stored file, save its Markdown and set the document to ``indexing`` or ``failed``.
 
     Args:
         document_id: Id of the document to process.
+
+    Returns:
+        True if the text was saved and the document now waits for indexing.
     """
     with Session(get_engine()) as db:
         doc = db.get(Document, document_id)
         if doc is None:
-            return
+            return False
         default_title = Path(doc.filename or "").stem
-        _set_status(db, doc, "reading")
+        set_status(db, doc, "reading")
         try:
             kind = kind_for_mime(doc.mime, doc.source_type)
             path = stored_path(doc)
@@ -56,12 +59,14 @@ def run_extraction(document_id: uuid.UUID) -> None:
             doc.page_count = result.page_count
             doc.word_count = word_count(result.markdown)
             doc.language = detect_language(result.markdown)
-            # NOTE: W4 inserts the chunking and embedding step ("indexing") before "ready".
-            _set_status(db, doc, "ready")
+            set_status(db, doc, "indexing")
+            return True
         except ExtractionError as error:
             db.rollback()
-            _set_status(db, doc, "failed", str(error))
+            set_status(db, doc, "failed", str(error))
+            return False
         except Exception:
             log.exception("Extraction of %s failed", document_id)
             db.rollback()
-            _set_status(db, doc, "failed", "Das Dokument konnte nicht gelesen werden.")
+            set_status(db, doc, "failed", "Das Dokument konnte nicht gelesen werden.")
+            return False

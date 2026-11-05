@@ -184,15 +184,19 @@ class EmbeddingModel(Base):
     status: Mapped[str] = mapped_column(Text, comment="building, active or retired.")
     progress: Mapped[float] = mapped_column(Float, server_default=text("0"), comment="0 to 1.")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=_NOW)
+    retired_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), comment="When the model stopped being active."
+    )
 
 
 class ChunkEmbedding(Base):
     """Vector of one chunk for one embedding model."""
 
     __tablename__ = "chunk_embeddings"
-    __table_args__ = {
-        "comment": "Chunk vectors; one HNSW cosine index per model is created by the re-index job."
-    }
+    __table_args__ = (
+        Index("chunk_embeddings_model_ix", "model_id"),
+        {"comment": "Chunk vectors; one HNSW cosine index per model is created by the re-index job."},
+    )
 
     chunk_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("chunks.id", ondelete="CASCADE"), primary_key=True

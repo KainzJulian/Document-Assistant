@@ -1,5 +1,7 @@
 """Pydantic models for providers, settings and the Ollama hardware check."""
 
+import uuid
+from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -135,3 +137,47 @@ class AckIn(BaseModel):
 
     model: str = Field(min_length=1, max_length=200)
     verdict: Verdict
+
+
+class EmbeddingModelOut(BaseModel):
+    """An embedding model and its state (``building``, ``active`` or ``retired``)."""
+
+    id: int
+    provider: str
+    model: str
+    dims: int
+    status: str
+    progress: float
+    created_at: datetime
+
+
+class EmbeddingCandidate(BaseModel):
+    """An enabled provider with the embedding models it offers."""
+
+    provider_kind: str
+    provider_label: str
+    models: list[str]
+
+
+class EmbeddingModelCreate(BaseModel):
+    """Body of ``POST /admin/embedding-models``."""
+
+    model_config = _strict
+
+    provider: Literal["openai", "google", "ollama"]
+    model: str = Field(min_length=1, max_length=200)
+
+
+class PassageOut(BaseModel):
+    """A retrieved passage (debug view)."""
+
+    chunk_id: uuid.UUID
+    document_id: uuid.UUID
+    document_title: str
+    section_path: str | None
+    page_from: int | None
+    page_to: int | None
+    text: str
+    score: float
+    vector_rank: int | None
+    keyword_rank: int | None

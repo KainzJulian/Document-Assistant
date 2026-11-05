@@ -17,6 +17,7 @@ import { BadgeComponent } from '../../ui/atoms/badge/badge.component';
 import { ButtonComponent } from '../../ui/atoms/button/button.component';
 import { InputComponent } from '../../ui/atoms/input/input.component';
 import { OllamaFitDialogComponent } from '../../ui/organisms/ollama-fit-dialog/ollama-fit-dialog.component';
+import { EmbeddingSection } from './embedding-section';
 import { ProviderDialogComponent } from '../../ui/organisms/provider-dialog/provider-dialog.component';
 
 const SELECT =
@@ -26,7 +27,7 @@ const SELECT =
 @Component({
   selector: 'app-settings-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [InputComponent, ButtonComponent, BadgeComponent, OllamaFitDialogComponent, ProviderDialogComponent],
+  imports: [InputComponent, ButtonComponent, BadgeComponent, OllamaFitDialogComponent, ProviderDialogComponent, EmbeddingSection],
   template: `
     <div class="mx-auto w-full max-w-2xl px-5 py-10">
       <h1 class="text-3xl font-semibold tracking-tight">{{ t.title }}</h1>
@@ -101,6 +102,7 @@ const SELECT =
             }
           </ul>
         </section>
+        <app-embedding-section />
       }
     </div>
 

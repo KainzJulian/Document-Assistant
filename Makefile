@@ -1,4 +1,4 @@
-.PHONY: hw-refresh check check-api check-web gen-api create-admin backup restore update up down
+.PHONY: ollama-pull hw-refresh check check-api check-web gen-api create-admin backup restore update up down
 
 COMPOSE = docker compose -f infra/docker-compose.yml --env-file infra/.env
 
@@ -16,6 +16,10 @@ check-web:
 gen-api:
 	cd apps/api && DATABASE_URL=postgresql+psycopg://x:x@localhost/x uv run python -c "import json; from app.main import app; json.dump(app.openapi(), open('../web/openapi.json', 'w'))"
 	cd apps/web && npx --yes openapi-typescript@7.13.0 openapi.json -o src/app/core/api-schema.ts
+
+# Pulls the default embedding model into the project's own Ollama (profile ollama must run).
+ollama-pull:
+	$(COMPOSE) exec ollama ollama pull bge-m3
 
 # Re-reads GPU name and VRAM (nvidia-smi or rocm-smi) for the Ollama hardware check.
 hw-refresh:
