@@ -89,6 +89,69 @@ export interface BenchmarkOut {
   seconds: number;
 }
 
+/** A source of an answer. */
+export interface Citation {
+  n: number;
+  chunk_id: string;
+  document_id: string;
+  document_title: string;
+  page_from: number | null;
+  page_to: number | null;
+  section_path: string | null;
+}
+
+/** A chat message as the API returns it. */
+export interface ChatMessageOut {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  citations: Citation[];
+  provider: string | null;
+  model: string | null;
+  interrupted: boolean;
+  created_at: string;
+}
+
+/** A document selected for a chat. */
+export interface ChatDocument {
+  id: string;
+  title: string;
+  status: string;
+}
+
+/** A chat with its documents and messages. */
+export interface ChatDetail {
+  id: string;
+  title: string | null;
+  provider: string | null;
+  model: string | null;
+  created_at: string;
+  updated_at: string;
+  documents: ChatDocument[];
+  messages: ChatMessageOut[];
+}
+
+/** A chat in the sidebar list or a search result. */
+export interface ChatSummary {
+  id: string;
+  title: string | null;
+  created_at: string;
+  updated_at: string;
+  snippet: string | null;
+  message_id: string | null;
+}
+
+/** A passage shown in the citation panel. */
+export interface ChunkOut {
+  id: string;
+  document_id: string;
+  document_title: string;
+  page_from: number | null;
+  page_to: number | null;
+  section_path: string | null;
+  text: string;
+}
+
 /** An error answer from the API: HTTP status, stable code and a German message. */
 export class ApiRequestError extends Error {
   /**

@@ -21,6 +21,8 @@ Scripts for the Check step of each plan task. They talk to a running stack (`mak
 | W3 providers, rules, account | `w3-providers-api.py` (inside the api container) and `w3-manual.md` | stack; the manual list needs real keys and the mini PC |
 | W4 chunker | `cd apps/api && uv run python ../../docs/checks/w4-chunking.py` | none |
 | W4 indexing and retrieval | `w4-indexing-api.py` (inside the api container), `eval/rag/run_retrieval.py`, `w4-manual.md`, `make-big-pdf.py` | stack; Ollama + bge-m3 for the vector part |
+| W5 chat | `w5-chat-api.py` (needs a real model), `w5-w6-manual.md` | stack, model configured, 2 sample PDFs ready |
+| W6 chat search | `w6-search-api.py` (inside the api container) | stack |
 | W1 extraction samples | `cd apps/api && uv run python ../../eval/extraction/run.py` | none |
 | W2 URL sample set | `docker exec -i doc-assistant-api-1 python - < eval/urls/run.py` | stack with internet |
 

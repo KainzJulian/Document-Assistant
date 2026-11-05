@@ -1,7 +1,9 @@
 import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { ChatSummary } from '../../../core/api';
 import { de } from '../../../core/i18n/de';
-import { InputComponent } from '../../atoms/input/input.component';
+import { ChatGroup } from '../../../domain/chats';
+import { ChatListComponent, ChatOpenRequest } from '../../organisms/chat-list/chat-list.component';
 
 const NAV_LINK =
   'flex min-h-10 w-full cursor-pointer items-center rounded-control px-3 text-sm transition-colors hover:bg-surface-muted pointer-coarse:min-h-11';
@@ -16,7 +18,7 @@ const NAV_LINK =
 @Component({
   selector: 'app-shell',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, RouterLinkActive, InputComponent],
+  imports: [RouterLink, RouterLinkActive, ChatListComponent],
   host: { '(document:keydown.escape)': 'closeDrawer()', class: 'block' },
   template: `
     <div class="flex h-dvh bg-background text-foreground">
@@ -46,10 +48,18 @@ const NAV_LINK =
           }
         </nav>
 
-        <div class="mx-3 mt-4">
-          <app-input [label]="t.nav.searchChats" [hideLabel]="true" type="search" [placeholder]="t.nav.searchChats" [disabled]="true" />
+        <div class="mt-4 min-h-0 flex-1 overflow-y-auto px-3">
+          <app-chat-list
+            [groups]="chatGroups()"
+            [results]="chatResults()"
+            [activeId]="activeChatId()"
+            [query]="chatQuery()"
+            (searchChanged)="chatSearch.emit($event)"
+            (opened)="openChat($event)"
+            (renameRequested)="chatRename.emit($event)"
+            (deleteRequested)="chatDelete.emit($event)"
+          />
         </div>
-        <p class="min-h-0 flex-1 overflow-y-auto px-5 pt-4 text-sm text-muted">{{ t.nav.noChats }}</p>
 
         <div class="flex items-center justify-between gap-2 border-t border-border px-5 py-4 text-sm">
           <span class="min-w-0 truncate font-medium">{{ userName() }}</span>
@@ -85,6 +95,31 @@ export class AppShellComponent {
   readonly logout = output<void>();
   /** Emits when the theme link is pressed. */
   readonly themeToggle = output<void>();
+  /** Chats grouped by date for the sidebar. */
+  readonly chatGroups = input<ChatGroup<ChatSummary>[]>([]);
+  /** Chat search results, or null without a search text. */
+  readonly chatResults = input<ChatSummary[] | null>(null);
+  /** The chat search text. */
+  readonly chatQuery = input('');
+  /** Id of the open chat. */
+  readonly activeChatId = input<string | null>(null);
+  /** Emits the chat search text. */
+  readonly chatSearch = output<string>();
+  /** Emits when a chat or search result is chosen. */
+  readonly chatOpen = output<ChatOpenRequest>();
+  /** Emits the id of the chat to rename. */
+  readonly chatRename = output<string>();
+  /** Emits the id of the chat to delete. */
+  readonly chatDelete = output<string>();
+
+  /**
+   * Open a chat and close the drawer.
+   * @param request - The chat (and message) to open.
+   */
+  protected openChat(request: ChatOpenRequest): void {
+    this.closeDrawer();
+    this.chatOpen.emit(request);
+  }
 
   /** Close the mobile drawer. */
   protected closeDrawer(): void {

@@ -53,6 +53,7 @@ import { DialogComponent } from '../../ui/organisms/dialog/dialog.component';
         </dl>
 
         <div class="mt-6 flex flex-wrap gap-2">
+          @if (d.status === 'ready') { <a class="inline-flex min-h-10 items-center rounded-control bg-primary px-4 text-sm font-medium text-on-primary hover:opacity-90 pointer-coarse:min-h-11" routerLink="/" [queryParams]="{ doc: d.id }">{{ t.document.startChat }}</a> }
           @if (d.filename) { <a class="inline-flex min-h-10 items-center rounded-control border border-border-strong bg-surface px-4 text-sm font-medium hover:bg-surface-muted pointer-coarse:min-h-11" [href]="'/api/documents/' + d.id + '/file'" [download]="d.filename">{{ t.document.download }}</a> }
           @if (d.mine) {
             <app-button (click)="reprocess(d)">{{ t.document.reprocess }}</app-button>
