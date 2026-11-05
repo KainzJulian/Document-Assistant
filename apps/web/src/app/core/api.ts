@@ -20,6 +20,75 @@ export type DocumentTextOut = Schemas['DocumentTextOut'];
 /** Login credentials. */
 export type LoginRequest = Schemas['LoginRequest'];
 
+// NOTE: The types below mirror the W3 endpoints by hand. `make gen-api` generates the same
+// shapes into api-schema.ts; switch to `Schemas[...]` when convenient.
+
+/** A provider as the admin sees it (the key is never returned). */
+export interface ProviderOut {
+  id: number;
+  kind: string;
+  label: string;
+  base_url: string | null;
+  enabled: boolean;
+  has_key: boolean;
+  models: string[];
+}
+
+/** Body to add or change a provider; an empty `api_key` keeps the stored one. */
+export interface ProviderForm {
+  kind: string;
+  label: string;
+  base_url: string;
+  api_key: string;
+}
+
+/** Result of "Verbindung testen". */
+export interface ProviderTestOut {
+  ok: boolean;
+  message: string;
+  models: string[];
+}
+
+/** A provider a person can pick a model from. */
+export interface ProviderChoice {
+  id: number;
+  kind: string;
+  label: string;
+  local: boolean;
+  models: string[];
+}
+
+/** A person's settings with the available choices. */
+export interface SettingsOut {
+  provider_id: number | null;
+  model: string | null;
+  summary_language: string;
+  providers: ProviderChoice[];
+}
+
+/** Verdict of the Ollama hardware check. */
+export type Verdict = 'fits' | 'partial' | 'cpu_only' | 'too_big';
+
+/** Answer of the Ollama hardware check. */
+export interface OllamaFit {
+  model: string;
+  ram_total_gb: number;
+  ram_free_gb: number;
+  gpu: { name: string; vram_total_gb: number; vram_free_gb: number } | null;
+  need_gb: number;
+  verdict: Verdict;
+  est_words_per_s: number | null;
+  needs_warning: boolean;
+  acknowledged: string | null;
+}
+
+/** Measured generation speed. */
+export interface BenchmarkOut {
+  words_per_s: number;
+  tokens: number;
+  seconds: number;
+}
+
 /** An error answer from the API: HTTP status, stable code and a German message. */
 export class ApiRequestError extends Error {
   /**

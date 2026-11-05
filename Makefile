@@ -1,4 +1,4 @@
-.PHONY: check check-api check-web gen-api create-admin backup restore update up down
+.PHONY: hw-refresh check check-api check-web gen-api create-admin backup restore update up down
 
 COMPOSE = docker compose -f infra/docker-compose.yml --env-file infra/.env
 
@@ -16,6 +16,10 @@ check-web:
 gen-api:
 	cd apps/api && DATABASE_URL=postgresql+psycopg://x:x@localhost/x uv run python -c "import json; from app.main import app; json.dump(app.openapi(), open('../web/openapi.json', 'w'))"
 	cd apps/web && npx --yes openapi-typescript@7.13.0 openapi.json -o src/app/core/api-schema.ts
+
+# Re-reads GPU name and VRAM (nvidia-smi or rocm-smi) for the Ollama hardware check.
+hw-refresh:
+	sh infra/scripts/detect-gpu.sh
 
 up:
 	$(COMPOSE) up -d --build

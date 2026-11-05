@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, FastAPI
 from app.deps import require_csrf_header
 from app.errors import register_error_handlers
 from app.jobs.app import procrastinate_app
-from app.routers import auth, documents, health, users
+from app.routers import admin_providers, auth, documents, hardware, health, settings, users
 
 
 @asynccontextmanager
@@ -33,4 +33,7 @@ api.include_router(health.router)
 api.include_router(auth.router)
 api.include_router(users.router)
 api.include_router(documents.router)
+api.include_router(admin_providers.router)
+api.include_router(settings.router)
+api.include_router(hardware.router)
 app.include_router(api)

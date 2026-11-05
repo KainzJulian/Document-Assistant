@@ -14,6 +14,9 @@ class Settings(BaseSettings):
         session_days: Sliding lifetime of a login session in days.
         ollama_url: Base URL of the Ollama server.
         files_dir: Directory of the ``files`` volume (original uploads).
+        hardware_json: GPU facts written by ``infra/scripts/detect-gpu.sh`` (mounted read-only).
+        memory_bandwidth_gb_s: Memory bandwidth used for the CPU speed estimate.
+        ollama_context: Context size Ollama models are assumed to run with.
     """
 
     database_url: str
@@ -21,6 +24,9 @@ class Settings(BaseSettings):
     session_days: int = 30
     ollama_url: str = "http://ollama:11434"
     files_dir: str = "/data/files"
+    hardware_json: str = "/data/hardware/hardware.json"
+    memory_bandwidth_gb_s: float = 20.0
+    ollama_context: int = 8192
 
     @property
     def conninfo(self) -> str:
