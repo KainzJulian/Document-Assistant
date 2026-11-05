@@ -43,7 +43,7 @@ for q in questions:
             answerable += 1
             top = c.get("/admin/retrieval-debug", params={"q": q["question"], "document_ids": ids}).json()
             hit = any(q["expect_passage"].lower() in p["text"].lower() for p in top)
-            ok = bool(judge(ANSWER_SYSTEM, f"FRAGE: {q['question']}\nERWARTETE ANTWORT: {q['expected']}\nANanTWORT: {answer}".replace("ANanTWORT", "ANTWORT")).get("correct"))
+            ok = bool(judge(ANSWER_SYSTEM, f"FRAGE: {q['question']}\nERWARTETE ANTWORT: {q['expected']}\nANTWORT: {answer}").get("correct"))
             hits += hit
             correct += ok
             # citation support: each sentence with [n] against the cited passage
