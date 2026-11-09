@@ -1,0 +1,7 @@
+node_modules
+dist
+.angular
+storybook-static
+e2e
+e2e-report
+test-results

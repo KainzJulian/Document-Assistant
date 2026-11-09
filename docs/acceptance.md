@@ -4,7 +4,7 @@ The app is done when all 20 criteria pass. The tests below were written in W10 a
 
 ## 1. Run the automated suite
 
-1. One-time: `cd apps/web && npx playwright install chromium`.
+1. One-time: `cd frontend && npx playwright install chromium`.
 2. `make check` (lint, types, Storybook build), then `make test-unit` (fast, no Docker).
 3. `make test-api` (needs Docker; starts a disposable Postgres on port 55432).
 4. `make test-web` (Vitest `unit` project and the Storybook interaction tests).
@@ -12,22 +12,22 @@ The app is done when all 20 criteria pass. The tests below were written in W10 a
 6. Everything green? Run steps 2 to 5 once more. Two green runs in a row are the exit criterion.
 7. Record both runs in `docs/test-log.md`.
 
-If a test fails, decide whether the app or the test is wrong. The tests were written without being run, so expect some wrong selectors and wrong guesses about text; the browser specs read the German texts in `apps/web/src/app/core/i18n/de.ts`.
+If a test fails, decide whether the app or the test is wrong. The tests were written without being run, so expect some wrong selectors and wrong guesses about text; the browser specs read the German texts in `frontend/src/app/core/i18n/de.ts`.
 
 ## 2. Where each criterion is tested
 
 | AC | Automated | By hand |
 | --- | --- | --- |
 | AC-1.1 File upload | `tests/test_documents.py` (every sample, bad files, empty PDF), `e2e/library.spec.ts` | 50 MB file (`docs/checks/w9-edge-cases.md`) |
-| AC-1.2 URL import | `tests/test_helpers.py` (address rules), `e2e/url.spec.ts` (local pages) | 13 of 15 real URLs: `eval/urls/run.py` |
+| AC-1.2 URL import | `tests/test_helpers.py` (address rules), `e2e/url.spec.ts` (local pages) | 13 of 15 real URLs: `backend/eval/urls/run.py` |
 | AC-1.3 Automatic saving | `e2e/library.spec.ts` | |
 | AC-1.4 Persistent library | `e2e/library.spec.ts` (logout, second device) | `make down` then `make up`, documents still there |
 | AC-2.1 Summary generation | `tests/test_summaries.py`, `e2e/summary.spec.ts` | |
 | AC-2.2 Length selection | `tests/test_summaries.py`, `tests/test_helpers.py`, `e2e/summary.spec.ts`, story `Length select / Choose` | |
-| AC-2.3 Accurate output | `e2e/eval-report.spec.ts` reads the report | `eval/run_summaries.py` with your real model |
+| AC-2.3 Accurate output | `e2e/eval-report.spec.ts` reads the report | `backend/eval/run_summaries.py` with your real model |
 | AC-3.1 Chatbot interface | `tests/test_chat.py`, `e2e/chat.spec.ts` | stop button while streaming (W5 manual list) |
 | AC-3.2 Document selection | `tests/test_chat.py`, `e2e/chat.spec.ts`, story `Document picker / SearchAndSelectAll` | |
-| AC-3.3 Interactive Q&A | `tests/test_chat.py`, `e2e/chat.spec.ts`, `e2e/eval-report.spec.ts` | `eval/run_rag.py` with your real model |
+| AC-3.3 Interactive Q&A | `tests/test_chat.py`, `e2e/chat.spec.ts`, `e2e/eval-report.spec.ts` | `backend/eval/run_rag.py` with your real model |
 | AC-4.1 Chat auto-save | `tests/test_chat.py`, `e2e/chat.spec.ts` (reload) | reload while an answer streams |
 | AC-4.2 Chat search | `tests/test_chat.py`, `e2e/search.spec.ts` (500 chats, under 300 ms) | |
 | AC-5.1 Sidebar | `e2e/navigation.spec.ts` | phone, tablet, desktop by eye |
@@ -46,7 +46,7 @@ The plan names `persistence.spec`, `upload.spec`, `navigation.spec` and others; 
 Tick each line after two weeks of real use with real documents.
 
 - [ ] AC-1.1 Upload a PDF, TXT, MD, DOCX, PPTX, HTML and EPUB at once; all reach "Bereit". A scan and a `.exe` fail with a clear German message.
-- [ ] AC-1.2 At least 13 of 15 real addresses (`eval/urls/run.py`) give clean text; a failure offers "Text einfügen".
+- [ ] AC-1.2 At least 13 of 15 real addresses (`backend/eval/urls/run.py`) give clean text; a failure offers "Text einfügen".
 - [ ] AC-1.3 Uploads and imports appear without a save step; the same file or address again says "Bereits in deiner Bibliothek".
 - [ ] AC-1.4 Documents are still there after logout, a browser restart, `make down` / `make up`, and on a phone.
 - [ ] AC-2.1 A document of someone else (shared) can be summarised; the text streams in and is still there after a reload.

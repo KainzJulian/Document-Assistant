@@ -1,0 +1,39 @@
+# Answer questions for backend/eval/run_rag.py (W8.1). YOU write 20: 15 answerable and 5 the documents cannot
+# answer, plus your 20 retrieval questions from questions.yaml (W4). Five examples for the generated
+# sample documents are included; upload backend/eval/summaries/docs/* and the extraction samples first.
+#
+# id, question, documents: as in questions.yaml
+# answerable:  false for questions the documents cannot answer (the assistant must say "not found")
+# expected:    the correct answer in one sentence (answerable questions only; the judge compares)
+# expect_passage: a phrase that must be in the top 8 passages (answerable questions only)
+
+- id: a1
+  question: Wie viel Photovoltaik-Leistung haben die Stadtwerke 2025 in Betrieb genommen?
+  documents: ["Stadtwerke Linz: Ausbau der Erneuerbaren"]
+  answerable: true
+  expected: 41 Megawatt
+  expect_passage: "41 Megawatt"
+
+- id: a2
+  question: Um wie viel Prozent sinkt der Strompreis für Haushalte?
+  documents: ["Stadtwerke Linz: Ausbau der Erneuerbaren"]
+  answerable: true
+  expected: Um 6 Prozent zum 1. Jänner 2026
+  expect_passage: "6 Prozent"
+
+- id: a3
+  question: What dividend does the board propose?
+  documents: ["Annual Report 2025 (synthetic)"]
+  answerable: true
+  expected: 1.20 euros per share
+  expect_passage: "1.20 euros"
+
+- id: u1
+  question: Wie viele Mitarbeiter haben die Stadtwerke Linz insgesamt?
+  documents: ["Stadtwerke Linz: Ausbau der Erneuerbaren"]
+  answerable: false
+
+- id: u2
+  question: Who is the CEO of the company in the annual report?
+  documents: ["Annual Report 2025 (synthetic)"]
+  answerable: false

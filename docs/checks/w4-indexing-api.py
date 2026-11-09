@@ -1,6 +1,6 @@
 """W4 check on the live stack: indexing, keyword retrieval, visibility, and (optionally) the model switch.
 
-    docker cp eval/extraction/samples doc-assistant-api-1:/tmp/samples
+    docker cp backend/eval/extraction/samples doc-assistant-api-1:/tmp/samples
     docker exec -i doc-assistant-api-1 python - < docs/checks/w4-indexing-api.py
 
 To include the vector part, add an Ollama provider with bge-m3 pulled (`make ollama-pull`), run

@@ -1,5 +1,4 @@
 # Environment and secrets
-infra/.env
 .env
 
 # Python
@@ -14,14 +13,14 @@ node_modules/
 dist/
 .angular/
 storybook-static/
-apps/web/openapi.json
+frontend/openapi.json
 
 # Test output
 .pytest_cache/
 .coverage
 htmlcov/
-apps/web/test-results/
-apps/web/e2e-report/
+frontend/test-results/
+frontend/e2e-report/
 
 # Runtime data
 backups/
@@ -30,3 +29,6 @@ hardware.json
 # OS / editor
 .DS_Store
 Thumbs.db
+
+# Vitest JSON report
+frontend/.vitest/

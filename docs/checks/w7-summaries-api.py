@@ -2,7 +2,7 @@
 
     docker exec -i doc-assistant-api-1 python - < docs/checks/w7-summaries-api.py
 
-Live block: upload eval/extraction/samples/bericht-de.pdf (short, ~540 words) and a 200-page PDF made with
+Live block: upload backend/eval/extraction/samples/bericht-de.pdf (short, ~540 words) and a 200-page PDF made with
 `docs/checks/make-big-pdf.py`, wait until both are ready, and choose a model in the settings.
 Set LIVE = False to run only the rules.
 """

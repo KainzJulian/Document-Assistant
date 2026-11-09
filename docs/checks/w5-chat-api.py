@@ -1,7 +1,7 @@
 """W5 check: the chat API end to end. Needs a real model.
 
 Prepare once: Settings, add a provider (e.g. Anthropic), "Verbindung testen", choose a model as julian.
-Upload eval/extraction/samples/bericht-de.pdf ("Mietvertrag Wohnung Linz") and report-en.pdf, wait until ready.
+Upload backend/eval/extraction/samples/bericht-de.pdf ("Mietvertrag Wohnung Linz") and report-en.pdf, wait until ready.
 
     docker exec -i doc-assistant-api-1 python - < docs/checks/w5-chat-api.py
 """

@@ -13,7 +13,7 @@ Go through `w9-edge-cases.md`.
 
 ## W9.3 Accessibility
 
-1. `make check`: Storybook's a11y addon is set to `error` (`apps/web/.storybook/preview.ts`); fix any violation it reports or lower the setting for that story with a comment.
+1. `make check`: Storybook's a11y addon is set to `error` (`frontend/.storybook/preview.ts`); fix any violation it reports or lower the setting for that story with a comment.
 2. Keyboard only, no mouse: log in, Tab to the skip link ("Zum Inhalt springen"), upload a file, open "Neuer Chat", pick a document, ask a question, open a citation, search chats, open settings. Every step must be reachable and the focus must be visible.
 3. Phone width: "Menü" moves the focus into the drawer, Esc or "Schließen" returns it to the menu button.
 4. Screen reader (NVDA or VoiceOver): a finished answer is read once, not token by token; errors are announced; dialogs announce their title.

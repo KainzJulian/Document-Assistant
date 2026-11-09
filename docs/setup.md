@@ -11,10 +11,10 @@ Everything runs as one Docker Compose project (`doc-assistant`): `proxy` (Caddy,
 
 ```sh
 git clone <repo> doc-assistant && cd doc-assistant
-cp infra/.env.example infra/.env
+cp .env.example .env
 ```
 
-Edit `infra/.env`:
+Edit `.env`:
 
 - `POSTGRES_PASSWORD`: choose a long random password.
 - `FERNET_KEY`: encrypts provider API keys later. Generate it once and keep it (a lost key makes stored API keys unreadable):
@@ -33,7 +33,7 @@ Open `http://<server-ip>:8080`, log in, and create the household accounts under 
 ### Server steps (W0.1, done by hand on the mini PC)
 
 - Allow the port from the LAN only: `sudo ufw allow from 192.168.1.0/24 to any port 8080 proto tcp`.
-- Decide about Ollama: share the recipe app's (set `OLLAMA_URL`, e.g. `http://host.docker.internal:11434`) or start your own with `docker compose -f infra/docker-compose.yml --env-file infra/.env --profile ollama up -d`.
+- Decide about Ollama: share the recipe app's (set `OLLAMA_URL`, e.g. `http://host.docker.internal:11434`) or start your own with `docker compose -f docker-compose.yml --env-file .env --profile ollama up -d`.
 - Check from a phone on Wi-Fi: `http://<server-ip>:8080/api/health` shows `{"db":true,"worker":true,...}`. `ollama` is `false` until Ollama runs.
 
 ## Backup, restore, update
@@ -44,15 +44,15 @@ make restore DIR=backups/<name>  # replaces database and files with that backup
 make update                      # backup, git pull, rebuild, restart (migrations run on start)
 ```
 
-Keep copies of `backups/` and of `infra/.env` (especially `FERNET_KEY`) off the server.
+Keep copies of `backups/` and of `.env` (especially `FERNET_KEY`) off the server.
 
 ## Development
 
 ```sh
 make check                       # lint, types, Storybook build (api and web)
-cd apps/web && npm start         # dev server on :4200, forwards /api to http://127.0.0.1:8080
-cd apps/web && npm run storybook # component workshop
+cd frontend && npm start         # dev server on :4200, forwards /api to http://127.0.0.1:8080
+cd frontend && npm run storybook # component workshop
 make gen-api                     # regenerate TypeScript API types after backend changes
 ```
 
-`npm start` needs the Compose stack running (`make up`). If your `PROXY_PORT` is not 8080, change the target in `apps/web/proxy.conf.json`.
+`npm start` needs the Compose stack running (`make up`). If your `PROXY_PORT` is not 8080, change the target in `frontend/proxy.conf.json`.

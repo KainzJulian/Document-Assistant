@@ -1,14 +1,14 @@
 """W4.1 check: chunks follow headings, stay within 600 words and keep page ranges.
 
 Run from the repository root (needs only the api project, no stack):
-    cd apps/api && uv run python ../../docs/checks/w4-chunking.py
+    cd backend && uv run python ../docs/checks/w4-chunking.py
 """
 
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "apps" / "api"))
+sys.path.insert(0, str(ROOT / "backend"))
 
 from app.services.chunking import MAX_WORDS, OVERLAP_WORDS, chunk_markdown  # noqa: E402
 from app.services.extractors import extract  # noqa: E402
@@ -21,7 +21,7 @@ def check(name, ok, extra=""):
     print(("PASS " if ok else "FAIL ") + name + (f"  [{extra}]" if extra else ""))
 
 
-samples = ROOT / "eval" / "extraction" / "samples"
+samples = ROOT / "backend" / "eval" / "extraction" / "samples"
 for name, kind in (("garantie.docx", "docx"), ("readme-de.md", "md"), ("bericht-de.pdf", "pdf"), ("buch-de.epub", "epub")):
     chunks = chunk_markdown(extract(kind, samples / name).markdown)
     check(f"{name}: produces chunks", len(chunks) > 0, f"{len(chunks)} chunks")

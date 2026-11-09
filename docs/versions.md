@@ -1,6 +1,6 @@
 # Pinned versions
 
-Recorded 2026-11-01 from the lockfiles (`apps/api/uv.lock`, `apps/web/package-lock.json`). Rationale: [ADR 0001](adr/0001-versions.md).
+Recorded 2026-11-01 from the lockfiles (`backend/uv.lock`, `frontend/package-lock.json`). Rationale: [ADR 0001](adr/0001-versions.md).
 
 ## Runtime
 
@@ -11,7 +11,7 @@ Recorded 2026-11-01 from the lockfiles (`apps/api/uv.lock`, `apps/web/package-lo
 | Postgres + pgvector | 16 (`pgvector/pgvector:pg16`) |
 | Caddy | 2 |
 
-## Frontend (`apps/web`)
+## Frontend (`frontend`)
 
 | Package | Version |
 | --- | --- |
@@ -28,7 +28,7 @@ Recorded 2026-11-01 from the lockfiles (`apps/api/uv.lock`, `apps/web/package-lo
 | vitest | 5.0.5 |
 | playwright | 1.64.1 |
 
-## Backend (`apps/api`)
+## Backend (`backend`)
 
 | Package | Version |
 | --- | --- |

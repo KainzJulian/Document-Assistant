@@ -1,6 +1,6 @@
 """Create a 200-page text PDF for the W4.2 / W1.3 checks (status changes and indexing time).
 
-    cd apps/api && uv run python ../../docs/checks/make-big-pdf.py big-200.pdf
+    cd backend && uv run python ../docs/checks/make-big-pdf.py big-200.pdf
 Then upload big-200.pdf in the library and watch Wartet, Wird gelesen, Wird indexiert, Bereit.
 """
 
