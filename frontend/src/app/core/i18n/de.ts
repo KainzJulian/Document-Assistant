@@ -59,6 +59,7 @@ export const de = {
   library: {
     title: 'Bibliothek',
     upload: 'Hochladen',
+    pickFiles: 'Dateien auswählen',
     hint: 'Dateien kannst du auch einfach hierher ziehen. PDF, Word, PowerPoint, Text, Markdown, HTML und EPUB, bis 50 MB.',
     dropNow: 'Zum Hochladen loslassen',
     search: 'Titel suchen',

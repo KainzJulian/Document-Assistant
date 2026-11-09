@@ -11,7 +11,7 @@ import { de } from '../../../core/i18n/de';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'relative block' },
   template: `
-    <input #picker type="file" multiple class="hidden" [accept]="accept()" (change)="onPick($event)" />
+    <input #picker type="file" multiple class="hidden" [attr.aria-label]="pickLabel" [accept]="accept()" (change)="onPick($event)" />
     <div (dragover)="onDragOver($event)" (dragleave)="dragging.set(false)" (drop)="onDrop($event)">
       <ng-content />
     </div>
@@ -25,6 +25,7 @@ import { de } from '../../../core/i18n/de';
 export class DropZoneComponent {
   private readonly picker = viewChild.required<ElementRef<HTMLInputElement>>('picker');
   protected readonly label = de.library.dropNow;
+  protected readonly pickLabel = de.library.pickFiles;
   protected readonly dragging = signal(false);
 
   /** Accepted file extensions for the picker. */
