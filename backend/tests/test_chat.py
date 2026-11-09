@@ -22,7 +22,9 @@ def events(response_text: str) -> list[tuple[str, object]]:
 def start_chat(client: TestClient, *names: str) -> str:
     """Upload documents and open a chat about them."""
     docs = upload_ready(client, *names)
-    return client.post("/api/chats", json={"document_ids": [d["id"] for d in docs]}).json()["id"]
+    response = client.post("/api/chats", json={"document_ids": [d["id"] for d in docs]})
+    assert response.status_code == 201, response.text
+    return response.json()["id"]
 
 
 def ask(client: TestClient, chat_id: str, text: str) -> list[tuple[str, object]]:

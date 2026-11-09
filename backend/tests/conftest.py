@@ -79,8 +79,8 @@ def make_user(username: str, password: str, role: str = "member") -> uuid.UUID:
     uid = uuid.uuid4()
     with get_engine().begin() as db:
         db.execute(
-            text("insert into users (id, username, display_name, password_hash, role) values (:i, :u, :u, :h, :r)"),
-            {"i": uid, "u": username, "h": hash_password(password), "r": role},
+            text("insert into users (id, username, display_name, password_hash, role) values (:i, :u, :d, :h, :r)"),
+            {"i": uid, "u": username, "d": username, "h": hash_password(password), "r": role},
         )
     return uid
 

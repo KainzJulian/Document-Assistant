@@ -2,8 +2,12 @@
 
 import uuid
 from datetime import datetime
+from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field
+
+# NOTE: JSON carries ids as strings, so ids in request bodies are not strict (the rest of the body is).
+DocumentId = Annotated[uuid.UUID, Field(strict=False)]
 
 
 class CitationOut(BaseModel):
@@ -68,7 +72,7 @@ class ChatCreate(BaseModel):
 
     model_config = ConfigDict(strict=True, extra="forbid")
 
-    document_ids: list[uuid.UUID] = Field(min_length=1, max_length=50)
+    document_ids: list[DocumentId] = Field(min_length=1, max_length=50)
 
 
 class ChatPatch(BaseModel):
@@ -77,7 +81,7 @@ class ChatPatch(BaseModel):
     model_config = ConfigDict(strict=True, extra="forbid")
 
     title: str | None = Field(default=None, min_length=1, max_length=200)
-    document_ids: list[uuid.UUID] | None = Field(default=None, min_length=1, max_length=50)
+    document_ids: list[DocumentId] | None = Field(default=None, min_length=1, max_length=50)
 
 
 class SendMessage(BaseModel):

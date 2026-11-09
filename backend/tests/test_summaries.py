@@ -19,7 +19,7 @@ def create(client: TestClient, doc_id: str, length: str, language: str = "source
 
 def saved(events: list[tuple[str, object]]) -> dict:
     """The summary from the final ``done`` event."""
-    return next(d for n, d in events if n == "done")
+    return next(d for n, d in events if n == "done")["summary"]
 
 
 def test_long_document_gets_the_exact_nominal_length(model_ready: TestClient) -> None:
