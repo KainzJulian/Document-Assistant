@@ -8,7 +8,18 @@ from fastapi import APIRouter, Depends, FastAPI
 from app.deps import require_csrf_header
 from app.errors import register_error_handlers
 from app.jobs.app import procrastinate_app
-from app.routers import admin_providers, auth, chats, documents, embeddings, hardware, health, settings, summaries, users
+from app.routers import (
+    admin_providers,
+    auth,
+    chats,
+    documents,
+    embeddings,
+    hardware,
+    health,
+    settings,
+    summaries,
+    users,
+)
 
 
 @asynccontextmanager
