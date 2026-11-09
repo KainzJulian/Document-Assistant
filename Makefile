@@ -1,4 +1,4 @@
-.PHONY: docs docs-api docs-web ollama-pull hw-refresh check check-api check-web gen-api create-admin backup restore update up down test test-db test-down test-api test-web test-e2e
+.PHONY: docs docs-api docs-web ollama-pull hw-refresh check check-api check-web gen-api create-admin backup restore update up down test test-unit test-db test-down test-api test-web test-e2e
 
 COMPOSE = docker compose -f infra/docker-compose.yml --env-file infra/.env
 
@@ -13,6 +13,11 @@ check-web:
 
 # Automated tests (W10). Backend and e2e use the fake provider: no keys, no network, no Ollama.
 test: test-api test-web
+
+# Unit tests only: no Docker, no database, no browser (about a minute).
+test-unit:
+	cd apps/api && uv run pytest tests/unit --no-cov
+	cd apps/web && npm run test:unit
 
 # Disposable Postgres on port 55432 for the backend tests.
 test-db:

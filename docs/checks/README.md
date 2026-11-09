@@ -35,6 +35,7 @@ These replace the hand scripts above for repeat runs. Nothing in W3 to W10 has b
 
 | Command | What it runs | Needs |
 | --- | --- | --- |
+| `make test-unit` | Unit tests only: `apps/api/tests/unit` (pytest, no database) and the Vitest `unit` project (domain helpers, API client, stores, services) | none |
 | `make test-api` | pytest in `apps/api/tests` against a throwaway Postgres (port 55432) with the fake model; fails below 85 percent coverage | Docker |
 | `make test-web` | Vitest: `unit` project (domain helpers, SSE client) and the Storybook component and interaction tests | `npx playwright install chromium` once |
 | `make test-e2e` | Playwright: one spec per acceptance criterion against a throwaway stack (fake model, fake hardware, local web pages) on port 8090 | Docker, `npx playwright install chromium` once |

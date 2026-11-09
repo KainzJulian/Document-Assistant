@@ -5,7 +5,7 @@ The app is done when all 20 criteria pass. The tests below were written in W10 a
 ## 1. Run the automated suite
 
 1. One-time: `cd apps/web && npx playwright install chromium`.
-2. `make check` (lint, types, Storybook build).
+2. `make check` (lint, types, Storybook build), then `make test-unit` (fast, no Docker).
 3. `make test-api` (needs Docker; starts a disposable Postgres on port 55432).
 4. `make test-web` (Vitest `unit` project and the Storybook interaction tests).
 5. `make test-e2e` (builds a throwaway stack on port 8090 and removes it afterwards).
